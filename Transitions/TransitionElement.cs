@@ -19,9 +19,9 @@ namespace Transitions
         /// </summary>
         public TransitionElement(double endTime, double endValue, InterpolationMethod interpolationMethod)
         {
-            EndTime = endTime;
-            EndValue = endValue;
-            InterpolationMethod = interpolationMethod;
+            this.EndTime = endTime;
+            this.EndValue = endValue;
+            this.InterpolationMethod = interpolationMethod;
         }
 
         /// <summary>

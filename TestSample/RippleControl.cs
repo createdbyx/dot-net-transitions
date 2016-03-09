@@ -27,7 +27,7 @@ namespace TestSample
         /// </summary>
         public RippleControl()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         /// <summary>
@@ -37,9 +37,9 @@ namespace TestSample
         {
             // We run a transition on each of the labels shown on the control.
             // This means that we will be running 100 simulataneous transitions...
-            foreach (CellInfo info in m_CellInfos)
+            foreach (var info in this.m_CellInfos)
             {
-                Transition.run(info.Control, "BackColor", Color.Pink, new TransitionType_Flash(1, info.TransitionInterval));
+                Transition.Run(info.Control, "BackColor", Color.Pink, new TransitionType_Flash(1, info.TransitionInterval));
             }
         }
         
@@ -52,29 +52,29 @@ namespace TestSample
         /// </summary>
         private void RippleControl_Load(object sender, EventArgs e)
         {
-            double dCellWidth = Width / 10.0;
-            double dCellHeight = Height / 10.0;
+            var dCellWidth = this.Width / 10.0;
+            var dCellHeight = this.Height / 10.0;
 
             // We set up a 10x10 grid of labels...
             double dTop = 0;
-            for (int iRow = 0; iRow <10; ++iRow)
+            for (var iRow = 0; iRow <10; ++iRow)
             {
                 double dLeft = 0;
-                double dBottom = dTop + dCellHeight;
+                var dBottom = dTop + dCellHeight;
                 
-                for (int iCol = 0; iCol < 10; ++iCol)
+                for (var iCol = 0; iCol < 10; ++iCol)
                 {
                     // We work out the size of this label...
-                    double dRight = dLeft + dCellWidth;
-                    int iLeft = (int)dLeft;
-                    int iTop = (int)dTop;
-                    int iRight = (int)dRight;
-                    int iBottom = (int)dBottom;
-                    int iWidth = iRight - iLeft;
-                    int iHeight = iBottom - iTop;
+                    var dRight = dLeft + dCellWidth;
+                    var iLeft = (int)dLeft;
+                    var iTop = (int)dTop;
+                    var iRight = (int)dRight;
+                    var iBottom = (int)dBottom;
+                    var iWidth = iRight - iLeft;
+                    var iHeight = iBottom - iTop;
 
                     // We create the label...
-                    Label label = new Label();
+                    var label = new Label();
                     label.Left = iLeft;
                     label.Top = iTop;
                     label.Width = iWidth;
@@ -82,12 +82,12 @@ namespace TestSample
                     label.BackColor = Color.White;
 
                     // And add it to the control...
-                    Controls.Add(label);
+                    this.Controls.Add(label);
 
                     // We work out a transition time for it, and store the information
                     // to use when we do the ripple effect...
-                    int iTransitionInterval = iRow * 100 + iCol * 100;
-                    m_CellInfos.Add(new CellInfo { Control = label, TransitionInterval = iTransitionInterval });
+                    var iTransitionInterval = iRow * 100 + iCol * 100;
+                    this.m_CellInfos.Add(new CellInfo { Control = label, TransitionInterval = iTransitionInterval });
 
                     // The left for the next column is the right for this one...
                     dLeft = dRight;

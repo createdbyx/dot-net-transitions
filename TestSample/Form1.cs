@@ -20,7 +20,7 @@ namespace TestSample
         /// </summary>
         public Form1()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         #endregion
@@ -40,15 +40,15 @@ namespace TestSample
             // We work out which box is currently on screen and
             // which is off screen...
             Control ctrlOnScreen, ctrlOffScreen;
-            if (gbBounce.Left == GROUP_BOX_LEFT)
+            if (this.gbBounce.Left == GROUP_BOX_LEFT)
             {
-                ctrlOnScreen = gbBounce;
-                ctrlOffScreen = gbThrowAndCatch;
+                ctrlOnScreen = this.gbBounce;
+                ctrlOffScreen = this.gbThrowAndCatch;
             }
             else
             {
-                ctrlOnScreen = gbThrowAndCatch;
-                ctrlOffScreen = gbBounce;
+                ctrlOnScreen = this.gbThrowAndCatch;
+                ctrlOffScreen = this.gbBounce;
             }
             ctrlOnScreen.SendToBack();
             ctrlOffScreen.BringToFront();
@@ -59,10 +59,10 @@ namespace TestSample
             // The ease-in-ease-out transition acclerates the rate of change for the 
             // first half of the animation, and decelerates during the second half.
 
-            Transition t = new Transition(new TransitionType_EaseInEaseOut(1000));
+            var t = new Transition(new TransitionType_EaseInEaseOut(1000));
             t.add(ctrlOnScreen, "Left", -1 * ctrlOnScreen.Width);
             t.add(ctrlOffScreen, "Left", GROUP_BOX_LEFT);
-            t.run();
+            t.Run();
         }
 
         /// <summary>
@@ -77,8 +77,8 @@ namespace TestSample
             // (as if with gravity) and decelerates it back  to its original value (as
             // if against gravity).
 
-            int iDestination = gbBounce.Height - cmdBounceMe.Height;
-            Transition.run(cmdBounceMe, "Top", iDestination, new TransitionType_Bounce(1500));
+            var iDestination = this.gbBounce.Height - this.cmdBounceMe.Height;
+            Transition.Run(this.cmdBounceMe, "Top", iDestination, new TransitionType_Bounce(1500));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace TestSample
             // decelerates to zero (as if against gravity) at the destination value. It 
             // then accelerates the value (as if with gravity) back to the original value.
 
-            Transition.run(cmdThrowAndCatch, "Top", 12, new TransitionType_ThrowAndCatch(1500));
+            Transition.Run(this.cmdThrowAndCatch, "Top", 12, new TransitionType_ThrowAndCatch(1500));
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace TestSample
             // The Flash transition animates the property to the destination value
             // and back again. You specify how many flashes to show and the length
             // of each flash...
-            Transition.run(cmdFlashMe, "BackColor", Color.Pink, new TransitionType_Flash(2, 300));
+            Transition.Run(this.cmdFlashMe, "BackColor", Color.Pink, new TransitionType_Flash(2, 300));
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace TestSample
             // The ripple is handled by the RippleControl user-control.
             // This performs 100 simultaneous animations to create the 
             // ripple effect...
-            ctrlRipple.ripple();
+            this.ctrlRipple.ripple();
         }
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace TestSample
         private void cmdSwapPictures_Click(object sender, EventArgs e)
         {
             // The transition is handled by the KittenPuppyControl...
-            ctrlPictures.transitionPictures();
+            this.ctrlPictures.transitionPictures();
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace TestSample
             // We work out the new text and colors to transition to...
             string strText1, strText2;
             Color color1, color2;
-            if (lblTextTransition1.Text == STRING_SHORT)
+            if (this.lblTextTransition1.Text == STRING_SHORT)
             {
                 strText1 = STRING_LONG;
                 color1 = Color.Red;
@@ -155,12 +155,12 @@ namespace TestSample
             }
 
             // We create a transition to animate all four properties at the same time...
-            Transition t = new Transition(new TransitionType_Linear(1000));
-            t.add(lblTextTransition1, "Text", strText1);
-            t.add(lblTextTransition1, "ForeColor", color1);
-            t.add(lblTextTransition2, "Text", strText2);
-            t.add(lblTextTransition2, "ForeColor", color2);
-            t.run();
+            var t = new Transition(new TransitionType_Linear(1000));
+            t.add(this.lblTextTransition1, "Text", strText1);
+            t.add(this.lblTextTransition1, "ForeColor", color1);
+            t.add(this.lblTextTransition2, "Text", strText2);
+            t.add(this.lblTextTransition2, "ForeColor", color2);
+            t.Run();
         }
 
         /// <summary>
@@ -169,8 +169,8 @@ namespace TestSample
         private void ctrlChangeFormColor_Click(object sender, EventArgs e)
         {
             // We alternate the form's background color...
-            Color destination = (BackColor == BACKCOLOR_PINK) ? BACK_COLOR_YELLOW : BACKCOLOR_PINK;
-            Transition.run(this, "BackColor", destination, new TransitionType_Linear(1000));
+            var destination = (this.BackColor == this.BACKCOLOR_PINK) ? this.BACK_COLOR_YELLOW : this.BACKCOLOR_PINK;
+            Transition.Run(this, "BackColor", destination, new TransitionType_Linear(1000));
         }
 
         /// <summary>
@@ -181,19 +181,19 @@ namespace TestSample
             // We either show more screen or less screen depending on the current state.
             // We find out whether we need to make the screen wider or narrower...
             int iFormWidth;
-            if (cmdMore.Text == "More >>")
+            if (this.cmdMore.Text == "More >>")
             {
                 iFormWidth = 984;
-                cmdMore.Text = "<< Less";
+                this.cmdMore.Text = "<< Less";
             }
             else
             {
                 iFormWidth = 452;
-                cmdMore.Text = "More >>";
+                this.cmdMore.Text = "More >>";
             }
 
             // We animate it with an ease-in-ease-out transition...
-            Transition.run(this, "Width", iFormWidth, new TransitionType_EaseInEaseOut(1000));
+            Transition.Run(this, "Width", iFormWidth, new TransitionType_EaseInEaseOut(1000));
         }
 
         /// <summary>
@@ -224,8 +224,8 @@ namespace TestSample
             elements.Add(new TransitionElement(90, 92, InterpolationMethod.Deceleration));
             elements.Add(new TransitionElement(100, 100, InterpolationMethod.Accleration));
 
-            int iDestination = gbDropAndBounce.Height - cmdDropAndBounce.Height - 10;
-            Transition.run(cmdDropAndBounce, "Top", iDestination, new TransitionType_UserDefined(elements, 2000));
+            var iDestination = this.gbDropAndBounce.Height - this.cmdDropAndBounce.Height - 10;
+            Transition.Run(this.cmdDropAndBounce, "Top", iDestination, new TransitionType_UserDefined(elements, 2000));
 
             // The transition above just animates the vertical bounce of the button, but not
             // the left-to-right movement. This can't use the same transition, as otherwise the
@@ -236,12 +236,12 @@ namespace TestSample
             // to its starting position as the second item in the chain. The second 
             // transition starts as soon as the first is complete...
 
-            Transition t1 = new Transition(new TransitionType_Linear(2000));
-            t1.add(cmdDropAndBounce, "Left", cmdDropAndBounce.Left + 400);
+            var t1 = new Transition(new TransitionType_Linear(2000));
+            t1.add(this.cmdDropAndBounce, "Left", this.cmdDropAndBounce.Left + 400);
 
-            Transition t2 = new Transition(new TransitionType_EaseInEaseOut(2000));
-            t2.add(cmdDropAndBounce, "Top", 19);
-            t2.add(cmdDropAndBounce, "Left", 6);
+            var t2 = new Transition(new TransitionType_EaseInEaseOut(2000));
+            t2.add(this.cmdDropAndBounce, "Top", 19);
+            t2.add(this.cmdDropAndBounce, "Left", 6);
 
             Transition.runChain(t1, t2);
         }

@@ -25,7 +25,7 @@ namespace Transitions
         /// </summary>
         public object copy(object o)
         {
-            string s = (string)o;
+            var s = (string)o;
             return new string(s.ToCharArray());
         }
 
@@ -34,47 +34,47 @@ namespace Transitions
         /// </summary>
         public object getIntermediateValue(object start, object end, double dPercentage)
         {
-            string strStart = (string)start;
-            string strEnd = (string)end;
+            var strStart = (string)start;
+            var strEnd = (string)end;
 
             // We find the length of the interpolated string...
-            int iStartLength = strStart.Length;
-            int iEndLength = strEnd.Length;
-            int iLength = Utility.interpolate(iStartLength, iEndLength, dPercentage);
-            char[] result = new char[iLength];
+            var iStartLength = strStart.Length;
+            var iEndLength = strEnd.Length;
+            var iLength = Utility.interpolate(iStartLength, iEndLength, dPercentage);
+            var result = new char[iLength];
 
             // Now we assign the letters of the results by interpolating the
             // letters from the start and end strings...
-            for (int i = 0; i < iLength; ++i)
+            for (var i = 0; i < iLength; ++i)
             {
                 // We get the start and end chars at this position...
-                char cStart = 'a';
+                var cStart = 'a';
                 if(i < iStartLength)
                 {
                     cStart = strStart[i];
                 }
-                char cEnd = 'a';
+                var cEnd = 'a';
                 if(i < iEndLength)
                 {
                     cEnd = strEnd[i];
                 }
 
                 // We interpolate them...
-				char cInterpolated;
-				if (cEnd == ' ')
-				{
-					// If the end character is a space we just show a space 
-					// regardless of interpolation. It looks better this way...
-					cInterpolated = ' ';
-				}
-				else
-				{
-					// The end character is not a space, so we interpolate...
-					int iStart = Convert.ToInt32(cStart);
-					int iEnd = Convert.ToInt32(cEnd);
-					int iInterpolated = Utility.interpolate(iStart, iEnd, dPercentage);
-					cInterpolated = Convert.ToChar(iInterpolated);
-				}
+                char cInterpolated;
+                if (cEnd == ' ')
+                {
+                    // If the end character is a space we just show a space 
+                    // regardless of interpolation. It looks better this way...
+                    cInterpolated = ' ';
+                }
+                else
+                {
+                    // The end character is not a space, so we interpolate...
+                    var iStart = Convert.ToInt32(cStart);
+                    var iEnd = Convert.ToInt32(cEnd);
+                    var iInterpolated = Utility.interpolate(iStart, iEnd, dPercentage);
+                    cInterpolated = Convert.ToChar(iInterpolated);
+                }
 
                 result[i] = cInterpolated;
             }

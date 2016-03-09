@@ -16,8 +16,8 @@ namespace Transitions
         /// </summary>
         public static object getValue(object target, string strPropertyName)
         {
-            Type targetType = target.GetType();
-            PropertyInfo propertyInfo = targetType.GetProperty(strPropertyName);
+            var targetType = target.GetType();
+            var propertyInfo = targetType.GetProperty(strPropertyName);
             if (propertyInfo == null)
             {
                 throw new Exception("Object: " + target.ToString() + " does not have the property: " + strPropertyName);
@@ -30,8 +30,8 @@ namespace Transitions
         /// </summary>
         public static void setValue(object target, string strPropertyName, object value)
         {
-            Type targetType = target.GetType();
-            PropertyInfo propertyInfo = targetType.GetProperty(strPropertyName);
+            var targetType = target.GetType();
+            var propertyInfo = targetType.GetProperty(strPropertyName);
             if (propertyInfo == null)
             {
                 throw new Exception("Object: " + target.ToString() + " does not have the property: " + strPropertyName);
@@ -44,9 +44,9 @@ namespace Transitions
 		/// </summary>
 		public static double interpolate(double d1, double d2, double dPercentage)
 		{
-			double dDifference = d2 - d1;
-			double dDistance = dDifference * dPercentage;
-			double dResult = d1 + dDistance;
+			var dDifference = d2 - d1;
+			var dDistance = dDifference * dPercentage;
+			var dResult = d1 + dDistance;
 			return dResult;
 		}
 
@@ -74,9 +74,9 @@ namespace Transitions
         {
             // The distance traveled is made up of two parts: the initial acceleration,
             // and then the subsequent deceleration...
-            double dFirstHalfTime = (dElapsed > 0.5) ? 0.5 : dElapsed;
-            double dSecondHalfTime = (dElapsed > 0.5) ? dElapsed - 0.5 : 0.0;
-            double dResult = 2 * dFirstHalfTime * dFirstHalfTime + 2 * dSecondHalfTime * (1.0 - dSecondHalfTime);
+            var dFirstHalfTime = (dElapsed > 0.5) ? 0.5 : dElapsed;
+            var dSecondHalfTime = (dElapsed > 0.5) ? dElapsed - 0.5 : 0.0;
+            var dResult = 2 * dFirstHalfTime * dFirstHalfTime + 2 * dSecondHalfTime * (1.0 - dSecondHalfTime);
             return dResult;
         }
 
@@ -108,7 +108,7 @@ namespace Transitions
         /// or we are on the same thread as the target, then the event is fired on the same
         /// thread as this is called from.
         /// </remarks>
-        public static void raiseEvent<T>(EventHandler<T> theEvent, object sender, T args) where T : System.EventArgs
+        public static void raiseEvent<T>(EventHandler<T> theEvent, object sender, T args) where T : EventArgs
         {
             // Is the event set up?
             if (theEvent == null)
@@ -123,7 +123,7 @@ namespace Transitions
             {
                 try
                 {
-                    ISynchronizeInvoke target = handler.Target as ISynchronizeInvoke;
+                    var target = handler.Target as ISynchronizeInvoke;
                     if (target == null || target.InvokeRequired == false)
                     {
                         // Either the target is not a form or control, or we are already

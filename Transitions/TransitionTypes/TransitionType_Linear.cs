@@ -22,7 +22,7 @@ namespace Transitions
 			{
 				throw new Exception("Transition time must be greater than zero.");
 			}
-			m_dTransitionTime = iTransitionTime;
+            this.m_dTransitionTime = iTransitionTime;
         }
 
         #endregion
@@ -34,7 +34,7 @@ namespace Transitions
 		/// </summary>
 		public void onTimer(int iTime, out double dPercentage, out bool bCompleted)
 		{
-			dPercentage = (iTime / m_dTransitionTime);
+			dPercentage = (iTime / this.m_dTransitionTime);
 			if (dPercentage >= 1.0)
 			{
 				dPercentage = 1.0;

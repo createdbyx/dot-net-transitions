@@ -42,16 +42,16 @@ namespace Transitions
         /// </summary>
         public void register(Transition transition)
         {
-            lock (m_Lock)
+            lock (this.m_Lock)
             {
                 // We check to see if the properties of this transition
                 // are already being animated by any existing transitions...
-                removeDuplicates(transition);
+                this.removeDuplicates(transition);
 
                 // We add the transition to the collection we manage, and 
                 // observe it so that we know when it has completed...
-                m_Transitions[transition] = true;
-                transition.TransitionCompletedEvent += onTransitionCompleted;
+                this.m_Transitions[transition] = true;
+                transition.TransitionCompletedEvent += this.onTransitionCompleted;
             }
         }
 
@@ -67,9 +67,9 @@ namespace Transitions
         private void removeDuplicates(Transition transition)
         {
             // We look through the set of transitions we're currently managing...
-            foreach (KeyValuePair<Transition, bool> pair in m_Transitions)
+            foreach (var pair in this.m_Transitions)
             {
-                removeDuplicates(transition, pair.Key);
+                this.removeDuplicates(transition, pair.Key);
             }
         }
 
@@ -85,18 +85,18 @@ namespace Transitions
             //       timer, so I don't think this matters too much.
 
             // We get the list of properties for the old and new transitions...
-            IList<Transition.TransitionedPropertyInfo> newProperties = newTransition.TransitionedProperties;
-            IList<Transition.TransitionedPropertyInfo> oldProperties = oldTransition.TransitionedProperties;
+            var newProperties = newTransition.TransitionedProperties;
+            var oldProperties = oldTransition.TransitionedProperties;
 
             // We loop through the old properties backwards (as we may be removing 
             // items from the list if we find a match)...
-            for (int i = oldProperties.Count - 1; i >= 0; i--)
+            for (var i = oldProperties.Count - 1; i >= 0; i--)
             {
                 // We get one of the properties from the old transition...
-                Transition.TransitionedPropertyInfo oldProperty = oldProperties[i];
+                var oldProperty = oldProperties[i];
 
                 // Is this property part of the new transition?
-                foreach (Transition.TransitionedPropertyInfo newProperty in newProperties)
+                foreach (var newProperty in newProperties)
                 {
                     if (oldProperty.target == newProperty.target
                         &&
@@ -115,9 +115,9 @@ namespace Transitions
         /// </summary>
         private TransitionManager()
         {
-            m_Timer = new Timer(15);
-            m_Timer.Elapsed += onTimerElapsed;
-            m_Timer.Enabled = true;
+            this.m_Timer = new Timer(15);
+            this.m_Timer.Elapsed += this.onTimerElapsed;
+            this.m_Timer.Enabled = true;
         }
 
         /// <summary>
@@ -127,32 +127,32 @@ namespace Transitions
         {
             // We turn the timer off while we process the tick, in case the
             // actions take longer than the tick itself...
-            if (m_Timer == null)
+            if (this.m_Timer == null)
             {
                 return;
             }
-            m_Timer.Enabled = false;
+            this.m_Timer.Enabled = false;
 
             IList<Transition> listTransitions;
-            lock (m_Lock)
+            lock (this.m_Lock)
             {
                 // We take a copy of the collection of transitions as elements 
                 // might be removed as we iterate through it...
                 listTransitions = new List<Transition>();
-                foreach (KeyValuePair<Transition, bool> pair in m_Transitions)
+                foreach (var pair in this.m_Transitions)
                 {
                     listTransitions.Add(pair.Key);
                 }
             }
 
             // We tick the timer for each transition we're managing...
-            foreach (Transition transition in listTransitions)
+            foreach (var transition in listTransitions)
             {
                 transition.onTimer();
             }
 
             // We restart the timer...
-            m_Timer.Enabled = true;
+            this.m_Timer.Enabled = true;
         }
 
         /// <summary>
@@ -161,13 +161,13 @@ namespace Transitions
         private void onTransitionCompleted(object sender, Transition.Args e)
         {
             // We stop observing the transition...
-            Transition transition = (Transition)sender;
-            transition.TransitionCompletedEvent -= onTransitionCompleted;
+            var transition = (Transition)sender;
+            transition.TransitionCompletedEvent -= this.onTransitionCompleted;
 
             // We remove the transition from the collection we're managing...
-            lock (m_Lock)
+            lock (this.m_Lock)
             {
-                m_Transitions.Remove(transition);
+                this.m_Transitions.Remove(transition);
             }
         }
 

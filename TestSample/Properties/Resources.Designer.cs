@@ -39,7 +39,7 @@ namespace TestSample.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("TestSample.Properties.Resources", typeof(Resources).Assembly);
+                    var temp = new global::System.Resources.ResourceManager("TestSample.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -65,7 +65,7 @@ namespace TestSample.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap kitten {
             get {
-                object obj = ResourceManager.GetObject("kitten", resourceCulture);
+                var obj = ResourceManager.GetObject("kitten", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -75,7 +75,7 @@ namespace TestSample.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap puppy {
             get {
-                object obj = ResourceManager.GetObject("puppy", resourceCulture);
+                var obj = ResourceManager.GetObject("puppy", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

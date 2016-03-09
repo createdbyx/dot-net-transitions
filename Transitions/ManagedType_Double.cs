@@ -24,7 +24,7 @@ namespace Transitions
 		/// </summary>
 		public object copy(object o)
 		{
-			double d = (double)o;
+			var d = (double)o;
 			return d;
 		}
 
@@ -33,8 +33,8 @@ namespace Transitions
 		/// </summary>
 		public object getIntermediateValue(object start, object end, double dPercentage)
 		{
-			double dStart = (double)start;
-			double dEnd = (double)end;
+			var dStart = (double)start;
+			var dEnd = (double)end;
 			return Utility.interpolate(dStart, dEnd, dPercentage);
 		}
 

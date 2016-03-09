@@ -53,7 +53,7 @@ namespace Transitions
         /// </summary>
         public TransitionType_UserDefined(IList<TransitionElement> elements, int iTransitionTime)
         {
-            setup(elements, iTransitionTime);
+            this.setup(elements, iTransitionTime);
         }
 
         /// <summary>
@@ -61,8 +61,8 @@ namespace Transitions
         /// </summary>
         public void setup(IList<TransitionElement> elements, int iTransitionTime)
         {
-            m_Elements = elements;
-            m_dTransitionTime = iTransitionTime;
+            this.m_Elements = elements;
+            this.m_dTransitionTime = iTransitionTime;
 
             // We check that the elements list has some members...
             if (elements.Count == 0)
@@ -80,7 +80,7 @@ namespace Transitions
         /// </summary>
         public void onTimer(int iTime, out double dPercentage, out bool bCompleted)
         {
-            double dTransitionTimeFraction = iTime / m_dTransitionTime;
+            var dTransitionTimeFraction = iTime / this.m_dTransitionTime;
 
             // We find the information for the element that we are currently processing...
             double dElementStartTime;
@@ -88,12 +88,12 @@ namespace Transitions
             double dElementStartValue;
             double dElementEndValue;
             InterpolationMethod eInterpolationMethod;
-            getElementInfo(dTransitionTimeFraction, out dElementStartTime, out dElementEndTime, out dElementStartValue, out dElementEndValue, out eInterpolationMethod);
+            this.getElementInfo(dTransitionTimeFraction, out dElementStartTime, out dElementEndTime, out dElementStartValue, out dElementEndValue, out eInterpolationMethod);
 
             // We find how far through this element we are as a fraction...
-            double dElementInterval = dElementEndTime - dElementStartTime;
-            double dElementElapsedTime = dTransitionTimeFraction - dElementStartTime;
-            double dElementTimeFraction = dElementElapsedTime / dElementInterval;
+            var dElementInterval = dElementEndTime - dElementStartTime;
+            var dElementElapsedTime = dTransitionTimeFraction - dElementStartTime;
+            var dElementTimeFraction = dElementElapsedTime / dElementInterval;
 
             // We convert the time-fraction to an fraction of the movement within the
             // element using the interpolation method...
@@ -125,7 +125,7 @@ namespace Transitions
             dPercentage = Utility.interpolate(dElementStartValue, dElementEndValue, dElementDistance);
 
             // Has the transition completed?
-            if (iTime >= m_dTransitionTime)
+            if (iTime >= this.m_dTransitionTime)
             {
                 // The transition has completed, so we make sure that
                 // it is at its final value...
@@ -150,11 +150,11 @@ namespace Transitions
             // element used the last time this function was called. In most cases
             // it will be the same one again, but it may have moved to a subsequent
             // on (maybe even skipping elements if enough time has passed)...
-            int iCount = m_Elements.Count;
-            for (; m_iCurrentElement < iCount; ++m_iCurrentElement)
+            var iCount = this.m_Elements.Count;
+            for (; this.m_iCurrentElement < iCount; ++this.m_iCurrentElement)
             {
-                TransitionElement element = m_Elements[m_iCurrentElement];
-                double dElementEndTime = element.EndTime / 100.0;
+                var element = this.m_Elements[this.m_iCurrentElement];
+                var dElementEndTime = element.EndTime / 100.0;
                 if (dTimeFraction < dElementEndTime)
                 {
                     break;
@@ -162,24 +162,24 @@ namespace Transitions
             }
 
             // If we have gone past the last element, we just use the last element...
-            if (m_iCurrentElement == iCount)
+            if (this.m_iCurrentElement == iCount)
             {
-                m_iCurrentElement = iCount - 1;
+                this.m_iCurrentElement = iCount - 1;
             }
 
             // We find the start values. These come from the previous element, except in the
             // case where we are currently in the first element, in which case they are zeros...
             dStartTime = 0.0;
             dStartValue = 0.0;
-            if (m_iCurrentElement > 0)
+            if (this.m_iCurrentElement > 0)
             {
-                TransitionElement previousElement = m_Elements[m_iCurrentElement - 1];
+                var previousElement = this.m_Elements[this.m_iCurrentElement - 1];
                 dStartTime = previousElement.EndTime / 100.0;
                 dStartValue = previousElement.EndValue / 100.0;
             }
 
             // We get the end values from the current element...
-            TransitionElement currentElement = m_Elements[m_iCurrentElement];
+            var currentElement = this.m_Elements[this.m_iCurrentElement];
             dEndTime = currentElement.EndTime / 100.0;
             dEndValue = currentElement.EndValue / 100.0;
             eInterpolationMethod = currentElement.InterpolationMethod;
