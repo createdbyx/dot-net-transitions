@@ -110,19 +110,19 @@ namespace Codefarts.Transitions
         /// <summary>
         /// Creates and immediately runs a transition on the property passed in.
         /// </summary>
-        public static Transition Run(object target, string strPropertyName, object destinationValue, ITransitionType transitionMethod)
+        public static Transition Run(object target, string propertyName, object destinationValue, ITransitionType transitionMethod)
         {
-            return Run(target, strPropertyName, destinationValue, transitionMethod, LoopType.None);
+            return Run(target, propertyName, destinationValue, transitionMethod, LoopType.None);
         }
 
 
         /// <summary>
         /// Creates and immediately runs a transition on the property passed in.
         /// </summary>
-        public static Transition Run(object target, string strPropertyName, object destinationValue, ITransitionType transitionMethod, LoopType type)
+        public static Transition Run(object target, string propertyName, object destinationValue, ITransitionType transitionMethod, LoopType type)
         {
             var t = new Transition(transitionMethod) { LoopType = type };
-            t.Add(target, strPropertyName, destinationValue);
+            t.Add(target, propertyName, destinationValue);
             t.Run();
             return t;
         }
@@ -131,10 +131,19 @@ namespace Codefarts.Transitions
         /// Sets the property passed in to the initial value passed in, then creates and 
         /// immediately runs a transition on it.
         /// </summary>
-        public static Transition Run(object target, string strPropertyName, object initialValue, object destinationValue, ITransitionType transitionMethod)
+        public static Transition Run(object target, string propertyName, object initialValue, object destinationValue, ITransitionType transitionMethod)
         {
-            Utility.SetValue(target, strPropertyName, initialValue);
-            return Run(target, strPropertyName, destinationValue, transitionMethod);
+            return Run(target, propertyName, initialValue, destinationValue, transitionMethod, LoopType.None);
+        }
+
+        /// <summary>
+        /// Sets the property passed in to the initial value passed in, then creates and 
+        /// immediately runs a transition on it.
+        /// </summary>
+        public static Transition Run(object target, string propertyName, object initialValue, object destinationValue, ITransitionType transitionMethod, LoopType type)
+        {
+            Utility.SetValue(target, propertyName, initialValue);
+            return Run(target, propertyName, destinationValue, transitionMethod, type);
         }
 
         #endregion
