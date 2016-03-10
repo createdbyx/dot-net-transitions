@@ -1,6 +1,8 @@
-# Dotnet Transitions
+# Codefarts.Transitions
 
-A library for animated UI transitions for .NET.
+A library for animated transitions for .NET.
+
+This code is a heavally modified & refactored version of [dot-net-transitions](https://github.com/UweKeim/dot-net-transitions) that keeps the core functionality.
 
 [![Build state](https://travis-ci.org/UweKeim/dot-net-transitions.svg?branch=master)](https://travis-ci.org/UweKeim/dot-net-transitions "Travis CI build status")
 

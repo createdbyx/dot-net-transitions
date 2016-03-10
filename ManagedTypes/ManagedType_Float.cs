@@ -29,31 +29,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Codefarts.Transitions
 {
-    /// <summary>
-    /// This transition bounces the property to a destination value and back to the
-    /// original value. It is decelerated to the destination and then acclerated back
-    /// as if being thrown against gravity and then descending back with gravity.
-    /// </summary>
-    public class TransitionType_ThrowAndCatch : TransitionType_UserDefined
+    using System;
+
+    internal class ManagedType_Float : IManagedType
     {
-        #region Public methods
+        #region IManagedType Members
 
         /// <summary>
-        /// Constructor. You pass in the total time taken for the bounce.
+        /// Returns the type we're managing.
         /// </summary>
-        public TransitionType_ThrowAndCatch(int iTransitionTime)
+        public Type GetManagedType()
         {
-            // We create a custom "user-defined" transition to do the work...
-            IList<TransitionElement> elements = new List<TransitionElement>();
-            elements.Add(new TransitionElement(50, 100, InterpolationMethod.Deceleration));
-            elements.Add(new TransitionElement(100, 0, InterpolationMethod.Accleration));
-            this.setup(elements, iTransitionTime);
+            return typeof(float);
+        }
+
+        /// <summary>
+        /// Returns a copy of the float passed in.
+        /// </summary>
+        public object Copy(object o)
+        {
+            var f = (float)o;
+            return f;
+        }
+
+        /// <summary>
+        /// Returns the interpolated value for the percentage passed in.
+        /// </summary>
+        public object GetIntermediateValue(object start, object end, double dPercentage)
+        {
+            var fStart = Convert.ToSingle(start);
+            var fEnd = Convert.ToSingle(end);
+            return Utility.Interpolate(fStart, fEnd, dPercentage);
         }
 
         #endregion

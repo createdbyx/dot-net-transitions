@@ -36,24 +36,37 @@ using System.Text;
 namespace Codefarts.Transitions
 {
     /// <summary>
-    /// This transition bounces the property to a destination value and back to the
-    /// original value. It is decelerated to the destination and then acclerated back
-    /// as if being thrown against gravity and then descending back with gravity.
+    /// Manages transitions for int properties.
     /// </summary>
-    public class TransitionType_ThrowAndCatch : TransitionType_UserDefined
+    internal class ManagedType_Int : IManagedType
     {
-        #region Public methods
+        #region IManagedType Members
 
         /// <summary>
-        /// Constructor. You pass in the total time taken for the bounce.
+        /// Returns the type we are managing.
         /// </summary>
-        public TransitionType_ThrowAndCatch(int iTransitionTime)
+        public Type GetManagedType()
         {
-            // We create a custom "user-defined" transition to do the work...
-            IList<TransitionElement> elements = new List<TransitionElement>();
-            elements.Add(new TransitionElement(50, 100, InterpolationMethod.Deceleration));
-            elements.Add(new TransitionElement(100, 0, InterpolationMethod.Accleration));
-            this.setup(elements, iTransitionTime);
+            return typeof(int);
+        }
+
+        /// <summary>
+        /// Returns a copy of the int passed in.
+        /// </summary>
+        public object Copy(object o)
+        {
+            var value = (int)o;
+            return value;
+        }
+
+        /// <summary>
+        /// Returns the value between the start and end for the percentage passed in.
+        /// </summary>
+        public object GetIntermediateValue(object start, object end, double dPercentage)
+        {
+            var iStart = (int)start;
+            var iEnd = (int)end;
+            return Utility.Interpolate(iStart, iEnd, dPercentage);
         }
 
         #endregion

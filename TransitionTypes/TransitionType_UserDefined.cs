@@ -1,9 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿/*
+Copyright (c) 2016 Codefarts
+contact@codefarts.com
+http://www.codefarts.com
+Now hosted here: https://github.com/UweKeim/dot-net-transitions
+Originally located here: https://code.google.com/archive/p/dot-net-transitions/
+---------------------------
 
-namespace Transitions
+The MIT License (MIT)
+
+Copyright (c) 2009 Richard S. Shepherd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+namespace Codefarts.Transitions
 {
+    using System;
+    using System.Collections.Generic;
+
     /// <summary>
     /// This class allows you to create user-defined transition types. You specify these
     /// as a list of TransitionElements. Each of these defines: 
@@ -78,7 +108,7 @@ namespace Transitions
         /// <summary>
         /// Called to find the value for the movement of properties for the time passed in.
         /// </summary>
-        public void onTimer(int iTime, out double dPercentage, out bool bCompleted)
+        public void OnTimer(int iTime, out double dPercentage, out bool bCompleted)
         {
             var dTransitionTimeFraction = iTime / this.m_dTransitionTime;
 
@@ -105,15 +135,15 @@ namespace Transitions
                     break;
 
                 case InterpolationMethod.Accleration:
-                    dElementDistance = Utility.convertLinearToAcceleration(dElementTimeFraction);
+                    dElementDistance = Utility.ConvertLinearToAcceleration(dElementTimeFraction);
                     break;
 
                 case InterpolationMethod.Deceleration:
-                    dElementDistance = Utility.convertLinearToDeceleration(dElementTimeFraction);
+                    dElementDistance = Utility.ConvertLinearToDeceleration(dElementTimeFraction);
                     break;
 
                 case InterpolationMethod.EaseInEaseOut:
-                    dElementDistance = Utility.convertLinearToEaseInEaseOut(dElementTimeFraction);
+                    dElementDistance = Utility.ConvertLinearToEaseInEaseOut(dElementTimeFraction);
                     break;
 
                 default:
@@ -122,7 +152,7 @@ namespace Transitions
 
             // We now know how far through the transition we have moved, so we can interpolate
             // the start and end values by this amount...
-            dPercentage = Utility.interpolate(dElementStartValue, dElementEndValue, dElementDistance);
+            dPercentage = Utility.Interpolate(dElementStartValue, dElementEndValue, dElementDistance);
 
             // Has the transition completed?
             if (iTime >= this.m_dTransitionTime)

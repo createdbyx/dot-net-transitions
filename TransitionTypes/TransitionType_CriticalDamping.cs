@@ -1,59 +1,90 @@
-﻿using System;
+﻿/*
+Copyright (c) 2016 Codefarts
+contact@codefarts.com
+http://www.codefarts.com
+Now hosted here: https://github.com/UweKeim/dot-net-transitions
+Originally located here: https://code.google.com/archive/p/dot-net-transitions/
+---------------------------
+
+The MIT License (MIT)
+
+Copyright (c) 2009 Richard S. Shepherd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Transitions
+namespace Codefarts.Transitions
 {
     /// <summary>
     /// This transition animates with an exponential decay. This has a damping effect
     /// similar to the motion of a needle on an electomagnetically controlled dial.
     /// </summary>
-	public class TransitionType_CriticalDamping : ITransitionType
-	{
-		#region Public methods
+    public class TransitionType_CriticalDamping : ITransitionType
+    {
+        #region Public methods
 
-		/// <summary>
-		/// Constructor. You pass in the time that the transition 
-		/// will take (in milliseconds).
-		/// </summary>
-		public TransitionType_CriticalDamping(int iTransitionTime)
-		{
-			if (iTransitionTime <= 0)
-			{
-				throw new Exception("Transition time must be greater than zero.");
-			}
-		    this.m_dTransitionTime = iTransitionTime;
-		}
+        /// <summary>
+        /// Constructor. You pass in the time that the transition 
+        /// will take (in milliseconds).
+        /// </summary>
+        public TransitionType_CriticalDamping(int iTransitionTime)
+        {
+            if (iTransitionTime <= 0)
+            {
+                throw new Exception("Transition time must be greater than zero.");
+            }
+            this.m_dTransitionTime = iTransitionTime;
+        }
 
-		#endregion
+        #endregion
 
-		#region ITransitionMethod Members
+        #region ITransitionMethod Members
 
-		/// <summary>
-		/// </summary>
-		public void onTimer(int iTime, out double dPercentage, out bool bCompleted)
-		{
-			// We find the percentage time elapsed...
-			var dElapsed = iTime / this.m_dTransitionTime;
-			dPercentage = (1.0 - Math.Exp(-1.0 * dElapsed * 5)) / 0.993262053;
+        /// <summary>
+        /// </summary>
+        public void OnTimer(int iTime, out double dPercentage, out bool bCompleted)
+        {
+            // We find the percentage time elapsed...
+            var dElapsed = iTime / this.m_dTransitionTime;
+            dPercentage = (1.0 - Math.Exp(-1.0 * dElapsed * 5)) / 0.993262053;
 
-			if (dElapsed >= 1.0)
-			{
-				dPercentage = 1.0;
-				bCompleted = true;
-			}
-			else
-			{
-				bCompleted = false;
-			}
-		}
+            if (dElapsed >= 1.0)
+            {
+                dPercentage = 1.0;
+                bCompleted = true;
+            }
+            else
+            {
+                bCompleted = false;
+            }
+        }
 
-		#endregion
+        #endregion
 
-		#region Private data
+        #region Private data
 
-		private double m_dTransitionTime = 0.0;
+        private double m_dTransitionTime = 0.0;
 
-		#endregion
-	}
+        #endregion
+    }
 }

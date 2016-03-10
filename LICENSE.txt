@@ -1,3 +1,10 @@
+Copyright (c) 2016 Codefarts
+contact@codefarts.com
+http://www.codefarts.com
+Now hosted here: https://github.com/UweKeim/dot-net-transitions
+Originally located here: https://code.google.com/archive/p/dot-net-transitions/
+---------------------------
+
 The MIT License (MIT)
 
 Copyright (c) 2009 Richard S. Shepherd

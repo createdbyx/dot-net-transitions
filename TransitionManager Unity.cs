@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (c) 2016 Codefarts
 contact@codefarts.com
 http://www.codefarts.com
@@ -29,33 +29,46 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
+#if UNITY_5
 namespace Codefarts.Transitions
 {
-    /// <summary>
-    /// This transition bounces the property to a destination value and back to the
-    /// original value. It is decelerated to the destination and then acclerated back
-    /// as if being thrown against gravity and then descending back with gravity.
-    /// </summary>
-    public class TransitionType_ThrowAndCatch : TransitionType_UserDefined
-    {
-        #region Public methods
+    using System;
 
+    using UnityEngine;
+
+    /// <summary>
+    /// This class is responsible for running transitions. It holds the timer that
+    /// triggers transition animation. 
+    /// </summary><remarks>
+    /// This class is a singleton.
+    /// 
+    /// We manage the transition timer here so that we can have a single timer
+    /// across all transitions. If each transition has its own timer, this creates
+    /// one thread for each transition, and this can lead to too many threads in
+    /// an application.
+    /// 
+    /// This class essentially just manages the timer for the transitions. It calls 
+    /// back into the running transitions, which do the actual work of the transition.
+    /// 
+    /// </remarks>
+    internal partial class TransitionManager : MonoBehaviour
+    {
         /// <summary>
-        /// Constructor. You pass in the total time taken for the bounce.
+        /// Update is called every frame, if the MonoBehaviour is enabled.
         /// </summary>
-        public TransitionType_ThrowAndCatch(int iTransitionTime)
+        public void Update()
         {
-            // We create a custom "user-defined" transition to do the work...
-            IList<TransitionElement> elements = new List<TransitionElement>();
-            elements.Add(new TransitionElement(50, 100, InterpolationMethod.Deceleration));
-            elements.Add(new TransitionElement(100, 0, InterpolationMethod.Accleration));
-            this.setup(elements, iTransitionTime);
+            this.UpdateTransitions();
         }
 
-        #endregion
+        /// <summary>
+        /// Gets the time in milliseconds.
+        /// </summary>
+        /// <returns>Returns the time in milliseconds.</returns>
+        public static int GetTime()
+        {
+            return (int)(Time.time * 1000);
+        }
     }
 }
+#endif

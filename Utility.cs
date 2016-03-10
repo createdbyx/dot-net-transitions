@@ -1,76 +1,106 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Reflection;
-using System.ComponentModel;
+﻿/*
+Copyright (c) 2016 Codefarts
+contact@codefarts.com
+http://www.codefarts.com
+Now hosted here: https://github.com/UweKeim/dot-net-transitions
+Originally located here: https://code.google.com/archive/p/dot-net-transitions/
+---------------------------
 
-namespace Transitions
+The MIT License (MIT)
+
+Copyright (c) 2009 Richard S. Shepherd
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+namespace Codefarts.Transitions
 {
-	/// <summary>
-	/// A class holding static utility functions.
-	/// </summary>
-	internal class Utility
-	{
+    using System;
+    using System.ComponentModel;
+
+    /// <summary>
+    /// A class holding static utility functions.
+    /// </summary>
+    internal class Utility
+    {
         /// <summary>
         /// Returns the value of the property passed in.
         /// </summary>
-        public static object getValue(object target, string strPropertyName)
+        public static object GetValue(object target, string strPropertyName)
         {
             var targetType = target.GetType();
             var propertyInfo = targetType.GetProperty(strPropertyName);
             if (propertyInfo == null)
             {
-                throw new Exception("Object: " + target.ToString() + " does not have the property: " + strPropertyName);
+                throw new Exception("Object: " + target + " does not have the property: " + strPropertyName);
             }
+
             return propertyInfo.GetValue(target, null);
         }
 
         /// <summary>
         /// Sets the value of the property passed in.
         /// </summary>
-        public static void setValue(object target, string strPropertyName, object value)
+        public static void SetValue(object target, string strPropertyName, object value)
         {
             var targetType = target.GetType();
             var propertyInfo = targetType.GetProperty(strPropertyName);
             if (propertyInfo == null)
             {
-                throw new Exception("Object: " + target.ToString() + " does not have the property: " + strPropertyName);
+                throw new Exception("Object: " + target + " does not have the property: " + strPropertyName);
             }
+
             propertyInfo.SetValue(target, value, null);
         }
 
-		/// <summary>
-		/// Returns a value between d1 and d2 for the percentage passed in.
-		/// </summary>
-		public static double interpolate(double d1, double d2, double dPercentage)
-		{
-			var dDifference = d2 - d1;
-			var dDistance = dDifference * dPercentage;
-			var dResult = d1 + dDistance;
-			return dResult;
-		}
+        /// <summary>
+        /// Returns a value between d1 and d2 for the percentage passed in.
+        /// </summary>
+        public static double Interpolate(double d1, double d2, double dPercentage)
+        {
+            var dDifference = d2 - d1;
+            var dDistance = dDifference * dPercentage;
+            var dResult = d1 + dDistance;
+            return dResult;
+        }
 
         /// <summary>
         /// Returns a value betweeen i1 and i2 for the percentage passed in.
         /// </summary>
-        public static int interpolate(int i1, int i2, double dPercentage)
+        public static int Interpolate(int i1, int i2, double dPercentage)
         {
-            return (int)interpolate((double)i1, (double)i2, dPercentage);
+            return (int)Interpolate((double)i1, (double)i2, dPercentage);
         }
     
         /// <summary>
         /// Returns a value betweeen f1 and f2 for the percentage passed in.
         /// </summary>
-        public static float interpolate(float f1, float f2, double dPercentage)
+        public static float Interpolate(float f1, float f2, double dPercentage)
         {
-            return (float)interpolate((double)f1, (double)f2, dPercentage);
+            return (float)Interpolate((double)f1, (double)f2, dPercentage);
         }
 
         /// <summary>
         /// Converts a fraction representing linear time to a fraction representing
         /// the distance traveled under an ease-in-ease-out transition.
         /// </summary>
-        public static double convertLinearToEaseInEaseOut(double dElapsed)
+        public static double ConvertLinearToEaseInEaseOut(double dElapsed)
         {
             // The distance traveled is made up of two parts: the initial acceleration,
             // and then the subsequent deceleration...
@@ -84,7 +114,7 @@ namespace Transitions
         /// Converts a fraction representing linear time to a fraction representing
         /// the distance traveled under a constant acceleration transition.
         /// </summary>
-        public static double convertLinearToAcceleration(double dElapsed)
+        public static double ConvertLinearToAcceleration(double dElapsed)
         {
             return dElapsed * dElapsed;
         }
@@ -93,7 +123,7 @@ namespace Transitions
         /// Converts a fraction representing linear time to a fraction representing
         /// the distance traveled under a constant deceleration transition.
         /// </summary>
-        public static double convertLinearToDeceleration(double dElapsed)
+        public static double ConvertLinearToDeceleration(double dElapsed)
         {
             return dElapsed * (2.0 - dElapsed);
         }
@@ -108,7 +138,7 @@ namespace Transitions
         /// or we are on the same thread as the target, then the event is fired on the same
         /// thread as this is called from.
         /// </remarks>
-        public static void raiseEvent<T>(EventHandler<T> theEvent, object sender, T args) where T : EventArgs
+        public static void RaiseEvent<T>(EventHandler<T> theEvent, object sender, T args) where T : EventArgs
         {
             // Is the event set up?
             if (theEvent == null)
