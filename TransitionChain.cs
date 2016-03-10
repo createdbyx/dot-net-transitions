@@ -31,6 +31,7 @@ SOFTWARE.
 
 namespace Codefarts.Transitions
 {
+    using System;
     using System.Collections.Generic;
 
     internal class TransitionChain
@@ -74,7 +75,7 @@ namespace Codefarts.Transitions
         /// <summary>
         /// Called when the transition we have just run has completed.
         /// </summary>
-        private void OnTransitionCompleted(object sender, Transition.Args e)
+        private void OnTransitionCompleted(object sender, EventArgs e)
         {
             // We unregister from the completed event...
             var transition = (Transition)sender;

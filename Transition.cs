@@ -33,9 +33,9 @@ namespace Codefarts.Transitions
 {
     using System;
     using System.Collections.Generic;
-    using System.Reflection;        
+    using System.Reflection;
     using System.ComponentModel;
-           
+
     /// <summary>
     /// Lets you perform animated transitions of properties on arbitrary objects. These 
     /// will often be transitions of UI properties, for example an animated fade-in of 
@@ -84,17 +84,22 @@ namespace Codefarts.Transitions
 
         #region Events
 
-        /// <summary>
-        /// Args passed with the TransitionCompletedEvent.
-        /// </summary>
-        public class Args : EventArgs
-        {
-        }
+        ///// <summary>
+        ///// Args passed with the TransitionCompletedEvent.
+        ///// </summary>
+        //public class Args : EventArgs
+        //{
+        //}
 
         /// <summary>
         /// Event raised when the transition hass completed.
         /// </summary>
-        public event EventHandler<Args> TransitionCompletedEvent;
+        public event EventHandler TransitionCompletedEvent;
+
+        /// <summary>
+        /// Gets or sets the type of the loop.
+        /// </summary>
+        LoopType LoopType { get; set; }
 
         #endregion
 
@@ -198,10 +203,11 @@ namespace Codefarts.Transitions
 
             // We start set the start time. We use this when the timer ticks to measure 
             // how long the transition has been runnning for...
-            this.startTime = TransitionManager.GetTime();
+            var manager = TransitionManager.Instance;
+            this.startTime = manager.GetTime();
 
             // We register this transition with the transition manager...
-            TransitionManager.Instance.Register(this);
+            manager.Register(this);
         }
 
         #endregion
@@ -231,7 +237,8 @@ namespace Codefarts.Transitions
         /// <summary>
         /// Called when the transition timer ticks.
         /// </summary>
-        internal void OnTimer()
+        /// <param name="currentTime">The current time in milliseconds.</param>
+        public void OnTimer(int currentTime)
         {
             // When the timer ticks we:
             // a. Find the elapsed time since the transition started.
@@ -239,7 +246,7 @@ namespace Codefarts.Transitions
             // c. Find the actual values of each property, and set them.
 
             // a.
-            var iElapsedTime = TransitionManager.GetTime() - this.startTime;// (int)this.m_Stopwatch.ElapsedMilliseconds;
+            var iElapsedTime = currentTime - this.startTime; 
 
             // b.
             double transitionPercentage;
@@ -270,9 +277,9 @@ namespace Codefarts.Transitions
 
             // Has the transition completed?
             if (isCompleted)
-            {                                              
+            {
                 // We raise an event to notify any observers that the transition has completed...
-                Utility.RaiseEvent(this.TransitionCompletedEvent, this, new Args());
+                Utility.RaiseEvent(this.TransitionCompletedEvent, this, EventArgs.Empty);
             }
         }
 

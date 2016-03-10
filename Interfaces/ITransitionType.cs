@@ -34,11 +34,6 @@ namespace Codefarts.Transitions
     public interface ITransitionType
     {
         /// <summary>
-        /// Gets or sets the type of the loop.
-        /// </summary>
-      //  LoopType LoopType { get; set; }
-        
-        /// <summary>
         /// Called by the Transition framework when its timer ticks to pass in the
         /// time (in ms) since the transition started. 
         /// 

@@ -31,6 +31,7 @@ SOFTWARE.
 
 namespace Codefarts.Transitions
 {
+    using System;
     using System.Collections.Generic;
 
 #if UNITY_5
@@ -53,8 +54,10 @@ namespace Codefarts.Transitions
     /// back into the running transitions, which do the actual work of the transition.
     /// 
     /// </remarks>
-    internal partial class TransitionManager
+    public partial class TransitionManager
     {
+        public Func<int> GetTimeCallback { get; set; }
+
         #region Public methods
 
         /// <summary>
@@ -67,8 +70,8 @@ namespace Codefarts.Transitions
                 if (singletonInstance == null)
                 {
 #if UNITY_5
+                    // setup game object that will be used for updating transitions
                     var container = CodefartsContainerObject.Instance;
-                    // setup game object that will be used for updating input
                     var newGameObj = new GameObject("Codefarts.TransitionManager");
                     newGameObj.transform.parent = container.GameObject.transform;
                     singletonInstance = newGameObj.AddComponent<TransitionManager>();
@@ -159,29 +162,41 @@ namespace Codefarts.Transitions
         /// </summary>
         private void UpdateTransitions()
         {
-            IList<Transition> listTransitions;
+            Transition[] listTransitions;
             lock (this.lockObject)
             {
                 // We take a copy of the collection of transitions as elements 
                 // might be removed as we iterate through it...
-                listTransitions = new List<Transition>();
-                foreach (var pair in this.transitionsCache)
-                {
-                    listTransitions.Add(pair.Key);
-                }
+                listTransitions = new Transition[this.transitionsCache.Count];
+                this.transitionsCache.Keys.CopyTo(listTransitions,0);
             }
 
             // We tick the timer for each transition we're managing...
             foreach (var transition in listTransitions)
             {
-                transition.OnTimer();
+                transition.OnTimer(this.GetTime());
             }
+        }
+
+        /// <summary>
+        /// Gets the time in milliseconds.
+        /// </summary>
+        /// <returns>Returns the time in milliseconds.</returns>
+        public int GetTime()
+        {
+            var timeCallback = this.GetTimeCallback;
+            if (timeCallback != null)
+            {
+                return timeCallback();
+            }
+
+            return (int)TimeSpan.FromTicks(DateTime.Now.Ticks).TotalMilliseconds;
         }
 
         /// <summary>
         /// Called when a transition has completed. 
         /// </summary>
-        private void OnTransitionCompleted(object sender, Transition.Args e)
+        private void OnTransitionCompleted(object sender, EventArgs e)
         {
             // We stop observing the transition...
             var transition = (Transition)sender;

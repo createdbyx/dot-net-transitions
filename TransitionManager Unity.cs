@@ -32,8 +32,6 @@ SOFTWARE.
 #if UNITY_5
 namespace Codefarts.Transitions
 {
-    using System;
-
     using UnityEngine;
 
     /// <summary>
@@ -51,23 +49,15 @@ namespace Codefarts.Transitions
     /// back into the running transitions, which do the actual work of the transition.
     /// 
     /// </remarks>
-    internal partial class TransitionManager : MonoBehaviour
+    public partial class TransitionManager : MonoBehaviour
     {
         /// <summary>
         /// Update is called every frame, if the MonoBehaviour is enabled.
         /// </summary>
         public void Update()
         {
+            this.GetTimeCallback = () => (int)(Time.time * 1000);
             this.UpdateTransitions();
-        }
-
-        /// <summary>
-        /// Gets the time in milliseconds.
-        /// </summary>
-        /// <returns>Returns the time in milliseconds.</returns>
-        public static int GetTime()
-        {
-            return (int)(Time.time * 1000);
         }
     }
 }

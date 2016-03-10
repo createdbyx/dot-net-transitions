@@ -87,7 +87,7 @@ namespace Codefarts.Transitions
         {
             return (int)Interpolate((double)i1, (double)i2, dPercentage);
         }
-    
+
         /// <summary>
         /// Returns a value betweeen f1 and f2 for the percentage passed in.
         /// </summary>
@@ -138,7 +138,7 @@ namespace Codefarts.Transitions
         /// or we are on the same thread as the target, then the event is fired on the same
         /// thread as this is called from.
         /// </remarks>
-        public static void RaiseEvent<T>(EventHandler<T> theEvent, object sender, T args) where T : EventArgs
+        public static void RaiseEvent(EventHandler theEvent, object sender, EventArgs args)
         {
             // Is the event set up?
             if (theEvent == null)
@@ -149,7 +149,7 @@ namespace Codefarts.Transitions
             // We loop through each of the delegate handlers for this event. For each of 
             // them we need to decide whether to invoke it on the current thread or to
             // make a cross-thread invocation...
-            foreach (EventHandler<T> handler in theEvent.GetInvocationList())
+            foreach (EventHandler handler in theEvent.GetInvocationList())
             {
                 try
                 {

@@ -49,7 +49,7 @@ namespace Codefarts.Transitions
     /// back into the running transitions, which do the actual work of the transition.
     /// 
     /// </remarks>
-    internal partial class TransitionManager
+    public partial class TransitionManager
     {
         // The timer that controls the transition animation...
         private Timer m_Timer;
@@ -82,8 +82,7 @@ namespace Codefarts.Transitions
 
             // We restart the timer...
             this.m_Timer.Enabled = true;
-        }
-
+        }                                 
     }
 } 
 #endif
