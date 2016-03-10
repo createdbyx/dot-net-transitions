@@ -49,9 +49,8 @@ namespace Codefarts.Transitions
         /// Returns a copy of the float passed in.
         /// </summary>
         public object Copy(object o)
-        {
-            var f = (float)o;
-            return f;
+        {                      
+            return o;
         }
 
         /// <summary>

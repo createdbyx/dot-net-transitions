@@ -33,7 +33,7 @@ namespace Codefarts.Transitions
 {
     using System;
     using System.Collections.Generic;
-
+    using System.Linq;
 #if UNITY_5
     using Codefarts.Core;
     using UnityEngine;
@@ -64,7 +64,7 @@ namespace Codefarts.Transitions
         /// Gets the singleton instance.
         /// </summary>
         public static TransitionManager Instance
-        {
+        {                                                                                         
             get
             {
                 if (singletonInstance == null)
@@ -89,17 +89,29 @@ namespace Codefarts.Transitions
         /// You register a transition with the manager here. This will start to run
         /// the transition as the manager's timer ticks.
         /// </summary>
-        public void Register(Transition transition)
+        public void Register<T>(Transition<T> transition)
         {
             lock (this.lockObject)
             {
-                // We check to see if the properties of this transition
-                // are already being animated by any existing transitions...
-                this.RemoveDuplicates(transition);
+                //// We check to see if the properties of this transition
+                //// are already being animated by any existing transitions...
+                //this.RemoveDuplicates(transition);
 
                 // We add the transition to the collection we manage, and 
                 // observe it so that we know when it has completed...
-                this.transitionsCache[transition] = true;
+                var type = typeof(T);
+                IList<ITransition> list;
+                if (!this.transitionsCache.ContainsKey(type))
+                {
+                    list = new List<ITransition>();
+                    this.transitionsCache[type] = list;
+                }
+                else
+                {
+                    list = this.transitionsCache[type];
+                }
+
+                list.Add(transition);
                 transition.TransitionCompletedEvent += this.OnTransitionCompleted;
             }
         }
@@ -108,73 +120,75 @@ namespace Codefarts.Transitions
 
         #region Private functions
 
-        /// <summary>
-        /// Checks if any existing transitions are acting on the same properties as the
-        /// transition passed in. If so, we remove the duplicated properties from the 
-        /// older transitions.
-        /// </summary>
-        private void RemoveDuplicates(Transition transition)
-        {
-            // We look through the set of transitions we're currently managing...
-            foreach (var pair in this.transitionsCache)
-            {
-                this.RemoveDuplicates(transition, pair.Key);
-            }
-        }
+        ///// <summary>
+        ///// Checks if any existing transitions are acting on the same properties as the
+        ///// transition passed in. If so, we remove the duplicated properties from the 
+        ///// older transitions.
+        ///// </summary>
+        //private void RemoveDuplicates(Transition transition)
+        //{
+        //    // We look through the set of transitions we're currently managing...
+        //    foreach (var pair in this.transitionsCache)
+        //    {
+        //        this.RemoveDuplicates(transition, pair.Key);
+        //    }
+        //}
 
-        /// <summary>
-        /// Finds any properties in the old-transition that are also in the new one,
-        /// and removes them from the old one.
-        /// </summary>
-        private void RemoveDuplicates(Transition newTransition, Transition oldTransition)
-        {
-            // Note: This checking might be a bit more efficient if it did the checking
-            //       with a set rather than looking through lists. That said, it is only done 
-            //       when transitions are added (which isn't very often) rather than on the
-            //       timer, so I don't think this matters too much.
+        ///// <summary>
+        ///// Finds any properties in the old-transition that are also in the new one,
+        ///// and removes them from the old one.
+        ///// </summary>
+        //private void RemoveDuplicates(Transition newTransition, Transition oldTransition)
+        //{
+        //    // Note: This checking might be a bit more efficient if it did the checking
+        //    //       with a set rather than looking through lists. That said, it is only done 
+        //    //       when transitions are added (which isn't very often) rather than on the
+        //    //       timer, so I don't think this matters too much.
 
-            // We get the list of properties for the old and new transitions...
-            var newProperties = newTransition.TransitionedProperties;
-            var oldProperties = oldTransition.TransitionedProperties;
+        //    // We get the list of properties for the old and new transitions...
+        //    var newProperties = newTransition.TransitionedProperties;
+        //    var oldProperties = oldTransition.TransitionedProperties;
 
-            // We loop through the old properties backwards (as we may be removing 
-            // items from the list if we find a match)...
-            for (var i = oldProperties.Count - 1; i >= 0; i--)
-            {
-                // We get one of the properties from the old transition...
-                var oldProperty = oldProperties[i];
+        //    // We loop through the old properties backwards (as we may be removing 
+        //    // items from the list if we find a match)...
+        //    for (var i = oldProperties.Count - 1; i >= 0; i--)
+        //    {
+        //        // We get one of the properties from the old transition...
+        //        var oldProperty = oldProperties[i];
 
-                // Is this property part of the new transition?
-                foreach (var newProperty in newProperties)
-                {
-                    if (oldProperty.target == newProperty.target && oldProperty.propertyInfo == newProperty.propertyInfo)
-                    {
-                        // The old transition contains the same property as the new one,
-                        // so we remove it from the old transition...
-                        oldTransition.RemoveProperty(oldProperty);
-                    }
-                }
-            }
-        }
+        //        // Is this property part of the new transition?
+        //        foreach (var newProperty in newProperties)
+        //        {
+        //            if (oldProperty.target == newProperty.target && oldProperty.propertyInfo == newProperty.propertyInfo)
+        //            {
+        //                // The old transition contains the same property as the new one,
+        //                // so we remove it from the old transition...
+        //                oldTransition.RemoveProperty(oldProperty);
+        //            }
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Updates the transitions in the transitions cache by calling there OnTimer method.
         /// </summary>
         private void UpdateTransitions()
         {
-            Transition[] listTransitions;
+            ITransition[] listTransitions;
             lock (this.lockObject)
             {
                 // We take a copy of the collection of transitions as elements 
                 // might be removed as we iterate through it...
-                listTransitions = new Transition[this.transitionsCache.Count];
-                this.transitionsCache.Keys.CopyTo(listTransitions,0);
+                listTransitions = this.transitionsCache.SelectMany(x => x.Value.Where(y=>y.Enabled)).ToArray();
+                //listTransitions = new ITransition[this.transitionsCache.Count];
+                //this.transitionsCache.CopyTo(listTransitions, 0);
             }
 
             // We tick the timer for each transition we're managing...
+            var currentTime = this.GetTime();
             foreach (var transition in listTransitions)
             {
-                transition.OnTimer(this.GetTime());
+                transition.OnTimer(currentTime);
             }
         }
 
@@ -199,13 +213,18 @@ namespace Codefarts.Transitions
         private void OnTransitionCompleted(object sender, EventArgs e)
         {
             // We stop observing the transition...
-            var transition = (Transition)sender;
+            var transition = (ITransition)sender;
             transition.TransitionCompletedEvent -= this.OnTransitionCompleted;
+            var type = transition.ValueType;
 
             // We remove the transition from the collection we're managing...
             lock (this.lockObject)
             {
-                this.transitionsCache.Remove(transition);
+                if (this.transitionsCache.ContainsKey(type))
+                {
+                    var list = this.transitionsCache[type];
+                    list.Remove(transition);
+                }
             }
         }
 
@@ -216,8 +235,11 @@ namespace Codefarts.Transitions
         // The singleton instance...
         private static TransitionManager singletonInstance;
 
+        //// The collection of transitions we're managing. (This should really be a set.)
+        //private IDictionary<Transition, bool> transitionsCache = new Dictionary<Transition, bool>();
         // The collection of transitions we're managing. (This should really be a set.)
-        private IDictionary<Transition, bool> transitionsCache = new Dictionary<Transition, bool>();
+        //private IList<Transition> transitionsCache = new List<Transition>();
+        private IDictionary<Type, IList<ITransition>> transitionsCache = new Dictionary<Type, IList<ITransition>>();
 
         // An object to lock on. This class can be accessed by multiple threads: the 
         // user thread can add new transitions; and the timerr thread can be animating 

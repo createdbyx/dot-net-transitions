@@ -38,11 +38,11 @@ namespace Codefarts.Transitions
     {
         #region Public methods
 
-        public TransitionChain(params Transition[] transitions) : this(true, transitions)
+        public TransitionChain(params ITransition[] transitions) : this(true, transitions)
         {
         }
 
-        public TransitionChain(bool run, params Transition[] transitions)
+        public TransitionChain(bool run, params ITransition[] transitions)
         {
             // We store the list of transitions...
             foreach (var transition in transitions)
@@ -85,7 +85,7 @@ namespace Codefarts.Transitions
         private void OnTransitionCompleted(object sender, EventArgs e)
         {
             // We unregister from the completed event...
-            var transition = (Transition)sender;
+            var transition = (ITransition)sender;
             transition.TransitionCompletedEvent -= this.OnTransitionCompleted;
 
             // We remove the completed transition from our collection, and
@@ -99,7 +99,7 @@ namespace Codefarts.Transitions
         #region Private data
 
         // The list of transitions in the chain...
-        private LinkedList<Transition> transitionsList = new LinkedList<Transition>();
+        private LinkedList<ITransition> transitionsList = new LinkedList<ITransition>();
 
         #endregion
     }
