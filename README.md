@@ -2,7 +2,7 @@
 
 A library for animated transitions for .NET.
 
-This code is a heavally modified & refactored version of [dot-net-transitions](https://github.com/UweKeim/dot-net-transitions) that keeps the core functionality.
+This code is a heavaily modified & refactored version of [dot-net-transitions](https://github.com/UweKeim/dot-net-transitions) that keeps the core functionality.
 
 [![Build state](https://travis-ci.org/UweKeim/dot-net-transitions.svg?branch=master)](https://travis-ci.org/UweKeim/dot-net-transitions "Travis CI build status")
 
@@ -12,7 +12,7 @@ The Transitions library lets you create animated transitions of any properties o
 
 The Transitions library is built with Visual Studio 2008 but targets version 2 of the .NET runtime, so it can be used with projects built with VS2005.
 
-## Downloads
+## Downloadss for the original source code which this code is derived from.
 
 - [**Get it on NuGet**](https://www.nuget.org/packages/dot-net-transitions/)
 - [Download latest DLL](https://github.com/UweKeim/dot-net-transitions/blob/master/Bin/Transitions/Transitions.dll?raw=true)
@@ -24,7 +24,7 @@ The Transitions library is built with Visual Studio 2008 but targets version 2 o
 You can animate a single property of an object with a single line of code like this:
 
 ```csharp
-Transition.run(this, "BackColor", Color.Red, new TransitionType_Linear(1000));
+Transition.Run(this, "BackColor", Color.Red, new TransitionType_Linear(1000));
 ```
 
 If this code is in a Form class, it animates the background color from its initial color to red over the course of 1000ms.
@@ -33,9 +33,9 @@ You can animate multiple properties (maybe across multiple objects) simultaneous
 
 ```csharp
 Transition t = new Transition(new TransitionType_EaseInEaseOut(2000));
-t.add(pictureBox1, "Left", 300);
-t.add(pictureBox1, "Top", 200);
-t.run();
+t.Add(pictureBox1, "Left", 300);
+t.Add(pictureBox1, "Top", 200);
+t.Run();
 ```
 
 This animates the movement of pictureBox1 from its initial location to (300, 200) over the course of 2000ms.
