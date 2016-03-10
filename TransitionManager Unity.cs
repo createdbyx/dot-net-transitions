@@ -52,11 +52,18 @@ namespace Codefarts.Transitions
     public partial class TransitionManager : MonoBehaviour
     {
         /// <summary>
+        /// Awake is called when the script instance is being loaded.
+        /// </summary>
+        public void Awake()
+        {
+            this.GetTimeCallback = () => (int)(Time.time * 1000);
+        }
+
+        /// <summary>
         /// Update is called every frame, if the MonoBehaviour is enabled.
         /// </summary>
         public void Update()
         {
-            this.GetTimeCallback = () => (int)(Time.time * 1000);
             this.UpdateTransitions();
         }
     }

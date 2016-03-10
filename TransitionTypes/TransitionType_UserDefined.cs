@@ -108,9 +108,9 @@ namespace Codefarts.Transitions
         /// <summary>
         /// Called to find the value for the movement of properties for the time passed in.
         /// </summary>
-        public bool OnTimer(int iTime, out double completionPercentage)
+        public bool OnTimer(int elapsedTime, out double completionPercentage)
         {
-            var dTransitionTimeFraction = iTime / this.transitionTime;
+            var dTransitionTimeFraction = elapsedTime / this.transitionTime;
 
             // We find the information for the element that we are currently processing...
             double dElementStartTime;
@@ -155,7 +155,7 @@ namespace Codefarts.Transitions
             completionPercentage = Utility.Interpolate(dElementStartValue, dElementEndValue, dElementDistance);
 
             // Has the transition completed?
-            if (iTime >= this.transitionTime)
+            if (elapsedTime >= this.transitionTime)
             {
                 // The transition has completed, so we make sure that
                 // it is at its final value...

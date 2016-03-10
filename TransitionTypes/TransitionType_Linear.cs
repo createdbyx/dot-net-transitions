@@ -61,9 +61,9 @@ namespace Codefarts.Transitions
         /// <summary>
         /// We return the percentage completed.
         /// </summary>
-        public bool OnTimer(int iTime, out double completionPercentage)
+        public bool OnTimer(int elapsedTime, out double completionPercentage)
         {
-            completionPercentage = (iTime / this.transitionTime);
+            completionPercentage = (elapsedTime / this.transitionTime);
             if (completionPercentage >= 1.0)
             {
                 completionPercentage = 1.0;

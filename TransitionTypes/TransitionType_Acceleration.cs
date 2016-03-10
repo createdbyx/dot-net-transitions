@@ -66,10 +66,10 @@ namespace Codefarts.Transitions
         /// at t=1.0 is 2, so the formula just becomes:
         ///   s = t^2
         /// </summary>
-        public bool OnTimer(int iTime, out double completionPercentage)
+        public bool OnTimer(int elapsedTime, out double completionPercentage)
         {
             // We find the percentage time elapsed...
-            var dElapsed = iTime / this.transitionTime;
+            var dElapsed = elapsedTime / this.transitionTime;
             completionPercentage = dElapsed * dElapsed;
             if (dElapsed >= 1.0)
             {

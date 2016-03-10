@@ -48,6 +48,6 @@ namespace Codefarts.Transitions
         /// You should return a bool indicating whether the transition has completed.
         /// (This may not be at the same time as the percentage has moved to 100%.)
         /// </summary>
-        bool OnTimer(int iTime, out double completionPercentage);
+        bool OnTimer(int elapsedTime, out double completionPercentage);
     }
 }

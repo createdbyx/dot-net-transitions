@@ -58,10 +58,10 @@ namespace Codefarts.Transitions
 
         #region ITransitionMethod Members
 
-        public bool OnTimer(int iTime, out double completionPercentage)
+        public bool OnTimer(int elapsedTime, out double completionPercentage)
         {
             // We find the percentage time elapsed...
-            var dElapsed = iTime / this.transitionTime;
+            var dElapsed = elapsedTime / this.transitionTime;
             completionPercentage = (1.0 - Math.Exp(-1.0 * dElapsed * 5)) / 0.993262053;
 
             if (dElapsed >= 1.0)

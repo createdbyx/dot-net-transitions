@@ -70,42 +70,42 @@ namespace Codefarts.Transitions
         }
 
         /// <summary>
-        /// Returns a value between d1 and d2 for the percentage passed in.
+        /// Returns a value between valueA and valueB for the percentage passed in.
         /// </summary>
-        public static double Interpolate(double d1, double d2, double dPercentage)
+        public static double Interpolate(double valueA, double valueB, double percentage)
         {
-            var dDifference = d2 - d1;
-            var dDistance = dDifference * dPercentage;
-            var dResult = d1 + dDistance;
+            var dDifference = valueB - valueA;
+            var dDistance = dDifference * percentage;
+            var dResult = valueA + dDistance;
             return dResult;
         }
 
         /// <summary>
-        /// Returns a value betweeen i1 and i2 for the percentage passed in.
+        /// Returns a value betweeen valueA and valueB for the percentage passed in.
         /// </summary>
-        public static int Interpolate(int i1, int i2, double dPercentage)
+        public static int Interpolate(int valueA, int valueB, double percentage)
         {
-            return (int)Interpolate((double)i1, (double)i2, dPercentage);
+            return (int)Interpolate((double)valueA, (double)valueB, percentage);
         }
 
         /// <summary>
-        /// Returns a value betweeen f1 and f2 for the percentage passed in.
+        /// Returns a value betweeen valueA and valueB for the percentage passed in.
         /// </summary>
-        public static float Interpolate(float f1, float f2, double dPercentage)
+        public static float Interpolate(float valueA, float valueB, double percentage)
         {
-            return (float)Interpolate((double)f1, (double)f2, dPercentage);
+            return (float)Interpolate((double)valueA, (double)valueB, percentage);
         }
 
         /// <summary>
         /// Converts a fraction representing linear time to a fraction representing
         /// the distance traveled under an ease-in-ease-out transition.
         /// </summary>
-        public static double ConvertLinearToEaseInEaseOut(double dElapsed)
+        public static double ConvertLinearToEaseInEaseOut(double elapsed)
         {
             // The distance traveled is made up of two parts: the initial acceleration,
             // and then the subsequent deceleration...
-            var dFirstHalfTime = (dElapsed > 0.5) ? 0.5 : dElapsed;
-            var dSecondHalfTime = (dElapsed > 0.5) ? dElapsed - 0.5 : 0.0;
+            var dFirstHalfTime = (elapsed > 0.5) ? 0.5 : elapsed;
+            var dSecondHalfTime = (elapsed > 0.5) ? elapsed - 0.5 : 0.0;
             var dResult = 2 * dFirstHalfTime * dFirstHalfTime + 2 * dSecondHalfTime * (1.0 - dSecondHalfTime);
             return dResult;
         }
@@ -114,18 +114,18 @@ namespace Codefarts.Transitions
         /// Converts a fraction representing linear time to a fraction representing
         /// the distance traveled under a constant acceleration transition.
         /// </summary>
-        public static double ConvertLinearToAcceleration(double dElapsed)
+        public static double ConvertLinearToAcceleration(double elapsed)
         {
-            return dElapsed * dElapsed;
+            return elapsed * elapsed;
         }
 
         /// <summary>
         /// Converts a fraction representing linear time to a fraction representing
         /// the distance traveled under a constant deceleration transition.
         /// </summary>
-        public static double ConvertLinearToDeceleration(double dElapsed)
+        public static double ConvertLinearToDeceleration(double elapsed)
         {
-            return dElapsed * (2.0 - dElapsed);
+            return elapsed * (2.0 - elapsed);
         }
 
         /// <summary>

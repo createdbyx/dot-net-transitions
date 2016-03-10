@@ -36,6 +36,8 @@ namespace Codefarts.Transitions
     using System.Reflection;
     using System.ComponentModel;
 
+    using UnityEngine;
+
     /// <summary>
     /// Lets you perform animated transitions of properties on arbitrary objects. These 
     /// will often be transitions of UI properties, for example an animated fade-in of 
@@ -99,7 +101,7 @@ namespace Codefarts.Transitions
         /// <summary>
         /// Gets or sets the type of the loop.
         /// </summary>
-        LoopType LoopType { get; set; }
+        public LoopType LoopType { get; set; }
 
         #endregion
 
@@ -110,7 +112,16 @@ namespace Codefarts.Transitions
         /// </summary>
         public static Transition Run(object target, string strPropertyName, object destinationValue, ITransitionType transitionMethod)
         {
-            var t = new Transition(transitionMethod);
+            return Run(target, strPropertyName, destinationValue, transitionMethod, LoopType.None);
+        }
+
+
+        /// <summary>
+        /// Creates and immediately runs a transition on the property passed in.
+        /// </summary>
+        public static Transition Run(object target, string strPropertyName, object destinationValue, ITransitionType transitionMethod, LoopType type)
+        {
+            var t = new Transition(transitionMethod) { LoopType = type };
             t.Add(target, strPropertyName, destinationValue);
             t.Run();
             return t;
@@ -125,7 +136,7 @@ namespace Codefarts.Transitions
             Utility.SetValue(target, strPropertyName, initialValue);
             return Run(target, strPropertyName, destinationValue, transitionMethod);
         }
-                  
+
         #endregion
 
         #region Public methods
@@ -186,12 +197,22 @@ namespace Codefarts.Transitions
         /// </summary>
         public void Run()
         {
+            this.InternalRun(true);
+        }
+
+        private void InternalRun(bool regster)
+        {
             // We find the current start values for the properties we 
             // are animating...
             foreach (var info in this.transitionedPropertiesList)
             {
-                var value = info.propertyInfo.GetValue(info.target, null);         
-                info.startValue = info.managedType.Copy(value);
+                var value = info.propertyInfo.GetValue(info.target, null);
+                if (regster)
+                {
+                    info.originalValue = info.managedType.Copy(value);
+                }
+
+                info.startValue = info.originalValue;
             }
 
             // We start set the start time. We use this when the timer ticks to measure 
@@ -200,7 +221,10 @@ namespace Codefarts.Transitions
             this.startTime = manager.GetTime();
 
             // We register this transition with the transition manager...
-            manager.Register(this);
+            if (regster)
+            {
+                manager.Register(this);
+            }
         }
 
         #endregion
@@ -239,11 +263,11 @@ namespace Codefarts.Transitions
             // c. Find the actual values of each property, and set them.
 
             // a.
-            var iElapsedTime = currentTime - this.startTime;
+            var elapsedTime = currentTime - this.startTime;
 
             // b.
             double transitionPercentage;
-            var isCompleted = this.transitionMethod.OnTimer(iElapsedTime, out transitionPercentage);
+            var isCompleted = this.transitionMethod.OnTimer(elapsedTime, out transitionPercentage);
 
             // We take a copy of the list of properties we are transitioning, as
             // they can be changed by another thread while this method is running...
@@ -252,7 +276,7 @@ namespace Codefarts.Transitions
             {
                 foreach (var info in this.transitionedPropertiesList)
                 {
-                    listTransitionedProperties.Add(info.copy());
+                    listTransitionedProperties.Add(info.Copy());
                 }
             }
 
@@ -270,8 +294,35 @@ namespace Codefarts.Transitions
             // Has the transition completed?
             if (isCompleted)
             {
-                // We raise an event to notify any observers that the transition has completed...
-                Utility.RaiseEvent(this.TransitionCompletedEvent, this, EventArgs.Empty);
+                switch (this.LoopType)
+                {
+                    case LoopType.None:
+                        // We raise an event to notify any observers that the transition has completed...
+                        Utility.RaiseEvent(this.TransitionCompletedEvent, this, EventArgs.Empty);
+                        break;
+
+                    case LoopType.Loop:
+                        Debug.Log("Looped");
+                        this.InternalRun(false);
+                        break;
+
+                    case LoopType.PingPong:
+                        Debug.Log("PingPong");
+                        // if we are ping ponging swap start and end values
+                        foreach (var info in this.transitionedPropertiesList)
+                        {
+                            var start = info.startValue;
+                            info.startValue = info.endValue;
+                            info.endValue = start;
+                        }
+
+                        // Reset the start time. We use this when the timer ticks to measure 
+                        // how long the transition has been runnning for...
+                        var manager = TransitionManager.Instance;
+                        this.startTime = manager.GetTime();
+
+                        break;
+                }
             }
         }
 
@@ -289,16 +340,16 @@ namespace Codefarts.Transitions
             try
             {
 #if WINDOWS
-                // If the target is a control that has been disposed then we don't 
-                // try to update its properties. This can happen if the control is
-                // on a form that has been closed while the transition is running...
+    // If the target is a control that has been disposed then we don't 
+    // try to update its properties. This can happen if the control is
+    // on a form that has been closed while the transition is running...
                 if (this.isDisposed(args.target))
                 {
                     return;
                 } 
 #endif
 
-                var invokeTarget = args.target as ISynchronizeInvoke;
+                var invokeTarget = args.Target as ISynchronizeInvoke;
                 if (invokeTarget != null && invokeTarget.InvokeRequired)
                 {
                     // There is some history behind the next two lines, which is worth
@@ -334,7 +385,7 @@ namespace Codefarts.Transitions
                 else
                 {
                     // We are on the correct thread, so we update the property...
-                    args.propertyInfo.SetValue(args.target, args.value, null);
+                    args.PropertyInfo.SetValue(args.Target, args.Value, null);
                 }
             }
             catch (Exception)
@@ -377,15 +428,21 @@ namespace Codefarts.Transitions
         internal class TransitionedPropertyInfo
         {
             public object startValue;
+            public object originalValue;
+
             public object endValue;
+
             public object target;
+
             public PropertyInfo propertyInfo;
+
             public IManagedType managedType;
 
-            public TransitionedPropertyInfo copy()
+            public TransitionedPropertyInfo Copy()
             {
                 var info = new TransitionedPropertyInfo();
                 info.startValue = this.startValue;
+                info.originalValue = this.originalValue;
                 info.endValue = this.endValue;
                 info.target = this.target;
                 info.propertyInfo = this.propertyInfo;
@@ -400,16 +457,18 @@ namespace Codefarts.Transitions
         // Event args used for the event we raise when updating a property...
         private class PropertyUpdateArgs : EventArgs
         {
-            public PropertyUpdateArgs(object t, PropertyInfo pi, object v)
+            public PropertyUpdateArgs(object targetObject, PropertyInfo propertyInfo, object value)
             {
-                this.target = t;
-                this.propertyInfo = pi;
-                this.value = v;
+                this.Target = targetObject;
+                this.PropertyInfo = propertyInfo;
+                this.Value = value;
             }
 
-            public object target;
-            public PropertyInfo propertyInfo;
-            public object value;
+            public object Target { get; private set; }
+
+            public PropertyInfo PropertyInfo { get; private set; }
+
+            public object Value { get; private set; }
         }
 
         // An object used to lock the list of transitioned properties, as it can be 
