@@ -108,31 +108,24 @@ namespace Codefarts.Transitions
         /// <summary>
         /// Creates and immediately runs a transition on the property passed in.
         /// </summary>
-        public static void Run(object target, string strPropertyName, object destinationValue, ITransitionType transitionMethod)
+        public static Transition Run(object target, string strPropertyName, object destinationValue, ITransitionType transitionMethod)
         {
             var t = new Transition(transitionMethod);
             t.Add(target, strPropertyName, destinationValue);
             t.Run();
+            return t;
         }
 
         /// <summary>
         /// Sets the property passed in to the initial value passed in, then creates and 
         /// immediately runs a transition on it.
         /// </summary>
-        public static void Run(object target, string strPropertyName, object initialValue, object destinationValue, ITransitionType transitionMethod)
+        public static Transition Run(object target, string strPropertyName, object initialValue, object destinationValue, ITransitionType transitionMethod)
         {
             Utility.SetValue(target, strPropertyName, initialValue);
-            Run(target, strPropertyName, destinationValue, transitionMethod);
+            return Run(target, strPropertyName, destinationValue, transitionMethod);
         }
-
-        /// <summary>
-        /// Creates a TransitionChain and runs it.
-        /// </summary>
-        public static void runChain(params Transition[] transitions)
-        {
-            var chain = new TransitionChain(transitions);
-        }
-
+                  
         #endregion
 
         #region Public methods
@@ -197,7 +190,7 @@ namespace Codefarts.Transitions
             // are animating...
             foreach (var info in this.transitionedPropertiesList)
             {
-                var value = info.propertyInfo.GetValue(info.target, null);
+                var value = info.propertyInfo.GetValue(info.target, null);         
                 info.startValue = info.managedType.Copy(value);
             }
 
@@ -246,12 +239,11 @@ namespace Codefarts.Transitions
             // c. Find the actual values of each property, and set them.
 
             // a.
-            var iElapsedTime = currentTime - this.startTime; 
+            var iElapsedTime = currentTime - this.startTime;
 
             // b.
             double transitionPercentage;
-            bool isCompleted;
-            this.transitionMethod.OnTimer(iElapsedTime, out transitionPercentage, out isCompleted);
+            var isCompleted = this.transitionMethod.OnTimer(iElapsedTime, out transitionPercentage);
 
             // We take a copy of the list of properties we are transitioning, as
             // they can be changed by another thread while this method is running...

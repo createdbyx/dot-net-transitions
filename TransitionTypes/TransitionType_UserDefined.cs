@@ -83,16 +83,16 @@ namespace Codefarts.Transitions
         /// </summary>
         public TransitionType_UserDefined(IList<TransitionElement> elements, int iTransitionTime)
         {
-            this.setup(elements, iTransitionTime);
+            this.Setup(elements, iTransitionTime);
         }
 
         /// <summary>
         /// Sets up the transitions. 
         /// </summary>
-        public void setup(IList<TransitionElement> elements, int iTransitionTime)
+        public void Setup(IList<TransitionElement> elements, int iTransitionTime)
         {
-            this.m_Elements = elements;
-            this.m_dTransitionTime = iTransitionTime;
+            this.transitionElements = elements;
+            this.transitionTime = iTransitionTime;
 
             // We check that the elements list has some members...
             if (elements.Count == 0)
@@ -108,9 +108,9 @@ namespace Codefarts.Transitions
         /// <summary>
         /// Called to find the value for the movement of properties for the time passed in.
         /// </summary>
-        public void OnTimer(int iTime, out double dPercentage, out bool bCompleted)
+        public bool OnTimer(int iTime, out double completionPercentage)
         {
-            var dTransitionTimeFraction = iTime / this.m_dTransitionTime;
+            var dTransitionTimeFraction = iTime / this.transitionTime;
 
             // We find the information for the element that we are currently processing...
             double dElementStartTime;
@@ -118,7 +118,7 @@ namespace Codefarts.Transitions
             double dElementStartValue;
             double dElementEndValue;
             InterpolationMethod eInterpolationMethod;
-            this.getElementInfo(dTransitionTimeFraction, out dElementStartTime, out dElementEndTime, out dElementStartValue, out dElementEndValue, out eInterpolationMethod);
+            this.GetElementInfo(dTransitionTimeFraction, out dElementStartTime, out dElementEndTime, out dElementStartValue, out dElementEndValue, out eInterpolationMethod);
 
             // We find how far through this element we are as a fraction...
             var dElementInterval = dElementEndTime - dElementStartTime;
@@ -152,26 +152,24 @@ namespace Codefarts.Transitions
 
             // We now know how far through the transition we have moved, so we can interpolate
             // the start and end values by this amount...
-            dPercentage = Utility.Interpolate(dElementStartValue, dElementEndValue, dElementDistance);
+            completionPercentage = Utility.Interpolate(dElementStartValue, dElementEndValue, dElementDistance);
 
             // Has the transition completed?
-            if (iTime >= this.m_dTransitionTime)
+            if (iTime >= this.transitionTime)
             {
                 // The transition has completed, so we make sure that
                 // it is at its final value...
-                bCompleted = true;
-                dPercentage = dElementEndValue;
+                completionPercentage = dElementEndValue;
+                return true;
             }
-            else
-            {
-                bCompleted = false;
-            }
+
+            return false;
         }
 
         /// <summary>
         /// Returns the element info for the time-fraction passed in. 
         /// </summary>
-        private void getElementInfo(double dTimeFraction, out double dStartTime, out double dEndTime, out double dStartValue, out double dEndValue, out InterpolationMethod eInterpolationMethod)
+        private void GetElementInfo(double dTimeFraction, out double dStartTime, out double dEndTime, out double dStartValue, out double dEndValue, out InterpolationMethod eInterpolationMethod)
         {
             // We need to return the start and end values for the current element. So this
             // means finding the element for the time passed in as well as the previous element.
@@ -180,39 +178,42 @@ namespace Codefarts.Transitions
             // element used the last time this function was called. In most cases
             // it will be the same one again, but it may have moved to a subsequent
             // on (maybe even skipping elements if enough time has passed)...
-            var iCount = this.m_Elements.Count;
-            for (; this.m_iCurrentElement < iCount; ++this.m_iCurrentElement)
+            var elementCount = this.transitionElements.Count;
+            TransitionElement element;
+            while ( this.currentElement < elementCount)
             {
-                var element = this.m_Elements[this.m_iCurrentElement];
+                element = this.transitionElements[this.currentElement];
                 var dElementEndTime = element.EndTime / 100.0;
                 if (dTimeFraction < dElementEndTime)
                 {
                     break;
                 }
+
+                this.currentElement++;
             }
 
             // If we have gone past the last element, we just use the last element...
-            if (this.m_iCurrentElement == iCount)
+            if (this.currentElement == elementCount)
             {
-                this.m_iCurrentElement = iCount - 1;
+                this.currentElement = elementCount - 1;
             }
 
             // We find the start values. These come from the previous element, except in the
             // case where we are currently in the first element, in which case they are zeros...
             dStartTime = 0.0;
             dStartValue = 0.0;
-            if (this.m_iCurrentElement > 0)
+            if (this.currentElement > 0)
             {
-                var previousElement = this.m_Elements[this.m_iCurrentElement - 1];
+                var previousElement = this.transitionElements[this.currentElement - 1];
                 dStartTime = previousElement.EndTime / 100.0;
                 dStartValue = previousElement.EndValue / 100.0;
             }
 
             // We get the end values from the current element...
-            var currentElement = this.m_Elements[this.m_iCurrentElement];
-            dEndTime = currentElement.EndTime / 100.0;
-            dEndValue = currentElement.EndValue / 100.0;
-            eInterpolationMethod = currentElement.InterpolationMethod;
+            element = this.transitionElements[this.currentElement];
+            dEndTime = element.EndTime / 100.0;
+            dEndValue = element.EndValue / 100.0;
+            eInterpolationMethod = element.InterpolationMethod;
         }
 
         #endregion
@@ -220,13 +221,13 @@ namespace Codefarts.Transitions
         #region Private data
 
         // The collection of elements that make up the transition...
-        private IList<TransitionElement> m_Elements = null;
+        private IList<TransitionElement> transitionElements;
 
         // The total transition time...
-        private double m_dTransitionTime = 0.0;
+        private double transitionTime;
 
         // The element that we are currently in (i.e. the current time within this element)...
-        private int m_iCurrentElement = 0;
+        private int currentElement;
 
         #endregion
     }

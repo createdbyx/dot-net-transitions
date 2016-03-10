@@ -51,7 +51,7 @@ namespace Codefarts.Transitions
             {
                 throw new Exception("Transition time must be greater than zero.");
             }
-            this.m_dTransitionTime = iTransitionTime;
+            this.transitionTime = iTransitionTime;
         }
 
         #endregion
@@ -61,25 +61,23 @@ namespace Codefarts.Transitions
         /// <summary>
         /// We return the percentage completed.
         /// </summary>
-        public void OnTimer(int iTime, out double dPercentage, out bool bCompleted)
+        public bool OnTimer(int iTime, out double completionPercentage)
         {
-            dPercentage = (iTime / this.m_dTransitionTime);
-            if (dPercentage >= 1.0)
+            completionPercentage = (iTime / this.transitionTime);
+            if (completionPercentage >= 1.0)
             {
-                dPercentage = 1.0;
-                bCompleted = true;
+                completionPercentage = 1.0;
+                return true;
             }
-            else
-            {
-                bCompleted = false;
-            }
+
+            return false;
         }
 
         #endregion
 
         #region Private data
 
-        private double m_dTransitionTime = 0.0;
+        private double transitionTime = 0.0;
 
         #endregion
     }

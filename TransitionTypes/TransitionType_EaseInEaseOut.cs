@@ -38,9 +38,7 @@ namespace Codefarts.Transitions
     /// half of the transition, and then decelerates during the second half.
     /// </summary>
     public class TransitionType_EaseInEaseOut : ITransitionType
-    {
-        public bool Loop { get; set; }
-
+    {                                     
         #region Public methods
 
         /// <summary>
@@ -62,48 +60,32 @@ namespace Codefarts.Transitions
         #region ITransitionMethod Members
 
         /// <summary>
-        /// Gets or sets the type of the loop.
-        /// </summary>
-        public LoopType LoopType { get; set; }
-
-        /// <summary>
         /// Works out the percentage completed given the time passed in.
         /// This uses the formula:
         ///   s = ut + 1/2at^2
         /// We accelerate as at the rate needed (a=4) to get to 0.5 at t=0.5, and
         /// then decelerate at the same rate to end up at 1.0 at t=1.0.
         /// </summary>
-        public void OnTimer(int iTime, out double dPercentage, out bool bCompleted)
+        public bool OnTimer(int iTime, out double completionPercentage)
         {
             // We find the percentage time elapsed...
-            var elapsedTime = iTime / this.transitionTime;
-            dPercentage = Utility.ConvertLinearToEaseInEaseOut(elapsedTime);
-            bCompleted = false;
+            var elapsedTime = iTime / this.transitionTime;                                        
+            completionPercentage = Utility.ConvertLinearToEaseInEaseOut(elapsedTime);
 
             if (elapsedTime >= 1.0)
             {
-                dPercentage = 1.0;
-                switch (this.LoopType)
-                {
-                    case LoopType.None:
-                        bCompleted = true;
-                        break;
-
-                    case LoopType.Loop:
-                        this.transitionTime = iTime;
-                        break;
-
-                    case LoopType.PingPong:
-                        break;
-                }
+                completionPercentage = 1.0;
+                return true;
             }
+
+            return false;
         }
 
         #endregion
 
         #region Private data
 
-        private double transitionTime = 0.0;
+        private double transitionTime;
 
         #endregion
     }

@@ -29,12 +29,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Codefarts.Transitions
 {
+    using System;
+
     /// <summary>
     /// This transition animates with an exponential decay. This has a damping effect
     /// similar to the motion of a needle on an electomagnetically controlled dial.
@@ -47,43 +45,39 @@ namespace Codefarts.Transitions
         /// Constructor. You pass in the time that the transition 
         /// will take (in milliseconds).
         /// </summary>
-        public TransitionType_CriticalDamping(int iTransitionTime)
+        public TransitionType_CriticalDamping(int timeSpan)
         {
-            if (iTransitionTime <= 0)
+            if (timeSpan <= 0)
             {
                 throw new Exception("Transition time must be greater than zero.");
             }
-            this.m_dTransitionTime = iTransitionTime;
+            this.transitionTime = timeSpan;
         }
 
         #endregion
 
         #region ITransitionMethod Members
 
-        /// <summary>
-        /// </summary>
-        public void OnTimer(int iTime, out double dPercentage, out bool bCompleted)
+        public bool OnTimer(int iTime, out double completionPercentage)
         {
             // We find the percentage time elapsed...
-            var dElapsed = iTime / this.m_dTransitionTime;
-            dPercentage = (1.0 - Math.Exp(-1.0 * dElapsed * 5)) / 0.993262053;
+            var dElapsed = iTime / this.transitionTime;
+            completionPercentage = (1.0 - Math.Exp(-1.0 * dElapsed * 5)) / 0.993262053;
 
             if (dElapsed >= 1.0)
             {
-                dPercentage = 1.0;
-                bCompleted = true;
+                completionPercentage = 1.0;
+                return true;
             }
-            else
-            {
-                bCompleted = false;
-            }
+
+            return false;
         }
 
         #endregion
 
         #region Private data
 
-        private double m_dTransitionTime = 0.0;
+        private double transitionTime = 0.0;
 
         #endregion
     }

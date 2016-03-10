@@ -29,12 +29,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Codefarts.Transitions
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// This transition bounces the property to a destination value and back to the
     /// original value. It is decelerated to the destination and then acclerated back
@@ -53,7 +51,7 @@ namespace Codefarts.Transitions
             IList<TransitionElement> elements = new List<TransitionElement>();
             elements.Add(new TransitionElement(50, 100, InterpolationMethod.Deceleration));
             elements.Add(new TransitionElement(100, 0, InterpolationMethod.Accleration));
-            this.setup(elements, iTransitionTime);
+            this.Setup(elements, iTransitionTime);
         }
 
         #endregion

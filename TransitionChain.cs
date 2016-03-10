@@ -34,11 +34,15 @@ namespace Codefarts.Transitions
     using System;
     using System.Collections.Generic;
 
-    internal class TransitionChain
+    public class TransitionChain
     {
         #region Public methods
 
-        public TransitionChain(params Transition[] transitions)
+        public TransitionChain(params Transition[] transitions) : this(true, transitions)
+        {
+        }
+
+        public TransitionChain(bool run, params Transition[] transitions)
         {
             // We store the list of transitions...
             foreach (var transition in transitions)
@@ -47,7 +51,10 @@ namespace Codefarts.Transitions
             }
 
             // We start running them...
-            this.RunNextTransition();
+            if (run)
+            {
+                this.Run();
+            }
         }
 
         #endregion
@@ -57,7 +64,7 @@ namespace Codefarts.Transitions
         /// <summary>
         /// Runs the next transition in the list.
         /// </summary>
-        private void RunNextTransition()
+        public void Run()
         {
             if (this.transitionsList.Count == 0)
             {
@@ -84,7 +91,7 @@ namespace Codefarts.Transitions
             // We remove the completed transition from our collection, and
             // run the next one...
             this.transitionsList.RemoveFirst();
-            this.RunNextTransition();
+            this.Run();
         }
 
         #endregion

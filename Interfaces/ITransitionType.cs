@@ -45,9 +45,9 @@ namespace Codefarts.Transitions
         /// 
         /// The percentage should be returned as (for example) 0.1 for 10%.
         /// 
-        /// You should return (in an out parameter) whether the transition has completed.
+        /// You should return a bool indicating whether the transition has completed.
         /// (This may not be at the same time as the percentage has moved to 100%.)
         /// </summary>
-        void OnTimer(int iTime, out double dPercentage, out bool bCompleted);
+        bool OnTimer(int iTime, out double completionPercentage);
     }
 }
