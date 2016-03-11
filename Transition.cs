@@ -32,68 +32,43 @@ SOFTWARE.
 namespace Codefarts.Transitions
 {
     using System;
-    using System.Collections.Generic;
-    using System.Reflection;
     using System.ComponentModel;
-    using System.Linq;
-
-    using UnityEngine;
 
     /// <summary>
-    /// Lets you perform animated transitions of properties on arbitrary objects. These 
+    /// Lets you perform animated transitions on arbitrary objects.
+    /// </summary>
+    /// <remarks>
+    /// <p>Lets you perform animated transitions on arbitrary objects. These 
     /// will often be transitions of UI properties, for example an animated fade-in of 
-    /// a UI object, or an animated move of a UI object from one position to another.
+    /// a UI object, or an animated move of a UI object from one position to another.</p>
     /// 
-    /// Each transition can simulataneously change multiple properties, including properties
-    /// across multiple objects.
+    /// <p>Each transition can simulataneously change multiple properties, including properties
+    /// across multiple objects.</p>
     /// 
-    /// Example transition
+    /// <pre>Example transition
     /// ------------------
     /// a.      Transition t = new Transition(new TransitionMethod_Linear(500));
     /// b.      t.add(form1, "Width", 500);
     /// c.      t.add(form1, "BackColor", Color.Red);
     /// d.      t.run();
-    ///   
-    /// Line a:         Creates a new transition. You specify the transition method.
+    /// </pre>
+    /// <p>Line a:         Creates a new transition. You specify the transition method.
     ///                 
     /// Lines b. and c: Set the destination values of the properties you are animating.
     /// 
-    /// Line d:         Starts the transition.
+    /// Line d:         Starts the transition.</p>
     /// 
-    /// Transition methods
+    /// <p>Transition methods
     /// ------------------
     /// TransitionMethod objects specify how the transition is made. Examples include
     /// linear transition, ease-in-ease-out and so on. Different transition methods may
-    /// need different parameters.
-    /// 
-    /// </summary>
+    /// need different parameters.                </p> 
+    /// </remarks>
     public partial class Transition<T> : ITransition
     {
-        #region Registration
-
-        ///// <summary>
-        ///// You should register all managed-types here.
-        ///// </summary>
-        //static Transition()
-        //{
-        //    RegisterType(new ManagedType_Int());
-        //    RegisterType(new ManagedType_Float());
-        //    RegisterType(new ManagedType_Double());
-        //    RegisterType(new ManagedType_Color());
-        //    RegisterType(new ManagedType_String());
-        //}
-
-        #endregion
-
-        #region Events
-
-        ///// <summary>
-        ///// Args passed with the TransitionCompletedEvent.
-        ///// </summary>
-        //public class Args : EventArgs
-        //{
-        //}
-
+        /// <summary>
+        /// Gets the type of the generic value used by the <see cref="Transition{T}" /> class.
+        /// </summary>
         public Type ValueType
         {
             get
@@ -103,7 +78,7 @@ namespace Codefarts.Transitions
         }
 
         /// <summary>
-        /// Event raised when the transition hass completed.
+        /// Event raised when the transition has completed.
         /// </summary>
         public event EventHandler TransitionCompletedEvent;
 
@@ -113,45 +88,52 @@ namespace Codefarts.Transitions
         public LoopType LoopType { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="Transition"/> is enabled.
+        /// Gets or sets a value indicating whether this <see cref="Transition{T}"/> is enabled.
         /// </summary>
         public bool Enabled { get; set; }
 
-        #endregion
-
         #region Public static methods
 
-        ///// <summary>
-        ///// Creates and immediately runs a transition on the property passed in.
-        ///// </summary>
-        //public static Transition Run(object target, string propertyName, object destinationValue, ITransitionType transitionMethod)
-        //{
-        //    return Run(target, propertyName, destinationValue, transitionMethod, LoopType.None);
-        //}
-
-
-        ///// <summary>
-        ///// Creates and immediately runs a transition on the property passed in.
-        ///// </summary>
-        //public static Transition Run(object target, string propertyName, object destinationValue, ITransitionType transitionMethod, LoopType type)
-        //{
-        //    var t = new Transition(transitionMethod) { LoopType = type };
-        //    t.Add(target, propertyName, destinationValue);
-        //    t.Run();
-        //    return t;
-        //}
+        /// <summary>
+        /// Gets or sets the callback responsible for setting the value.
+        /// </summary>
         public Action<T> SetValueCallback { get; set; }
-        public Func<T, T, double, T> InterpolateCallback { get; set; }
+
+        /// <summary>
+        /// Gets or sets the interpolate callback responsible for interpolating across values.
+        /// </summary>
+        public static Func<T, T, double, T> InterpolateCallback { get; set; }
+
+        /// <summary>
+        /// Creates and immediately runs a transition on the property passed in.
+        /// </summary>
+        public static Transition<T> Run(Action<T> setValue, T startValue, T destinationValue, ITransitionType transitionMethod)
+        {
+            return Run(setValue, startValue, destinationValue, transitionMethod, LoopType.None);
+        }
 
         /// <summary>
         /// Creates and immediately runs a transition on the property passed in.
         /// </summary>
         public static Transition<T> Run(Action<T> setValue, T startValue, T destinationValue, ITransitionType transitionMethod, LoopType type)
         {
-            var t = new Transition<T>(transitionMethod) { LoopType = type, startValue = startValue, currentValue = startValue, SetValueCallback = setValue, endValue = destinationValue };
-            //  t.Add( propertyName, destinationValue);
-            t.Run();
+            var t = new Transition<T>(transitionMethod);
+            t.LoopType = type;
+            t.OriginalValue = startValue;
+            t.StartValue = startValue;
+            t.CurrentValue = startValue;
+            t.SetValueCallback = setValue;
+            t.EndValue = destinationValue;
+            TransitionManager.Instance.Register(t);
             return t;
+        }
+
+        /// <summary>
+        /// Creates and immediately runs a transition on the property passed in.
+        /// </summary>
+        public static Transition<T> Run(Action<T> setValue, T destinationValue, ITransitionType transitionMethod)
+        {
+            return Run(setValue, destinationValue, transitionMethod, LoopType.None);
         }
 
         /// <summary>
@@ -159,214 +141,49 @@ namespace Codefarts.Transitions
         /// </summary>
         public static Transition<T> Run(Action<T> setValue, T destinationValue, ITransitionType transitionMethod, LoopType type)
         {
-            var t = new Transition<T>(transitionMethod) { LoopType = type, SetValueCallback = setValue, endValue = destinationValue };
-            //  t.Add( propertyName, destinationValue);
-            t.Run();
+            var t = new Transition<T>(transitionMethod) { LoopType = type, SetValueCallback = setValue, EndValue = destinationValue };
+            TransitionManager.Instance.Register(t);
             return t;
         }
-
-        ///// <summary>
-        ///// Creates and immediately runs a transition on the property passed in.
-        ///// </summary>
-        //public static Transition Run<T>(Func<T> getValue, Action<T> setValue, T destinationValue, ITransitionType transitionMethod, LoopType type)
-        //{
-        //    var t = new Transition(transitionMethod) { LoopType = type };
-        //    t.Add(getValue, setValue, destinationValue);
-        //    t.Run();
-        //    return t;
-        //}
-
-        ///// <summary>
-        ///// Sets the property passed in to the initial value passed in, then creates and 
-        ///// immediately runs a transition on it.
-        ///// </summary>
-        //public static Transition Run(object target, string propertyName, object initialValue, object destinationValue, ITransitionType transitionMethod)
-        //{
-        //    return Run(target, propertyName, initialValue, destinationValue, transitionMethod, LoopType.None);
-        //}
-
-        ///// <summary>
-        ///// Sets the property passed in to the initial value passed in, then creates and 
-        ///// immediately runs a transition on it.
-        ///// </summary>
-        //public static Transition Run(object target, string propertyName, object initialValue, object destinationValue, ITransitionType transitionMethod, LoopType type)
-        //{
-        //    Utility.SetValue(target, propertyName, initialValue);
-        //    return Run(target, propertyName, destinationValue, transitionMethod, type);
-        //}
-
-        ///// <summary>
-        ///// Sets the property passed in to the initial value passed in, then creates and 
-        ///// immediately runs a transition on it.
-        ///// </summary>
-        //public static Transition Run(float initialValue, float destinationValue, ITransitionType transitionMethod, LoopType type)
-        //{
-        //    Utility.SetValue(target, propertyName, initialValue);
-        //    return Run(target, propertyName, destinationValue, transitionMethod, type);
-        //}
-
-        ///// <summary>
-        ///// Sets the property passed in to the initial value passed in, then creates and 
-        ///// immediately runs a transition on it.
-        ///// </summary>
-        //public static Transition Run<T>(Func<T> getValue, Action<T> setValue, T initialValue, T destinationValue, ITransitionType transitionMethod, LoopType type)
-        //{
-        //    setValue(initialValue);
-        //    return Run(getValue, setValue, destinationValue, transitionMethod, type);
-        //}
 
         #endregion
 
         #region Public methods
 
         /// <summary>
-        /// Constructor. You pass in the object that holds the properties 
-        /// that you are performing transitions on.
+        /// Initializes a new instance of the <see cref="Transition{T}"/> class.
         /// </summary>
-        public Transition(ITransitionType transitionMethod)
+        public Transition()
         {
-            this.transitionMethod = transitionMethod;
             this.Enabled = true;
         }
 
-        ///// <summary>
-        ///// Adds a property that should be animated as part of this transition.
-        ///// </summary>
-        //public void Add(object target, string propertyName, object destinationValue)
-        //{
-        //    // We get the property info...
-        //    var targetType = target.GetType();
-        //    var propertyInfo = targetType.GetProperty(propertyName);
-        //    if (propertyInfo == null)
-        //    {
-        //        throw new Exception("Object: " + target + " does not have the property: " + propertyName);
-        //    }
-
-        //    // We check that we support the property type...
-        //    var propertyType = propertyInfo.PropertyType;
-        //    if (managedTypes.ContainsKey(propertyType) == false)
-        //    {
-        //        throw new Exception("Transition does not handle properties of type: " + propertyType);
-        //    }
-
-        //    // We can only transition properties that are both getable and setable...
-        //    if (propertyInfo.CanRead == false || propertyInfo.CanWrite == false)
-        //    {
-        //        throw new Exception("Property is not both getable and setable: " + propertyName);
-        //    }
-
-        //    var managedType = managedTypes[propertyType];
-
-        //    // We can manage this type, so we store the information for the
-        //    // transition of this property...
-        //    var info = new TransitionedPropertyInfo();
-        //    info.endValue = destinationValue;
-        //    info.target = target;
-        //    info.propertyInfo = propertyInfo;
-        //    info.managedType = managedType;
-
-        //    lock (this.lockObject)
-        //    {
-        //        this.transitionedPropertiesList.Add(info);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Adds a property that should be animated as part of this transition.
-        ///// </summary>
-        //public void Add(  string propertyName, float destinationValue)
-        //{
-        //    // We can manage this type, so we store the information for the
-        //    // transition of this property...
-        //    var info = new TransitionedPropertyInfo();
-        //    info.endValue = destinationValue;
-        //     lock (this.lockObject)
-        //    {
-        //        this.transitionedPropertiesList.Add(propertyName, info);
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Adds a property that should be animated as part of this transition.
-        ///// </summary>
-        //public void Add<T>(Func<T> getValue, Action<T> setValue, T destinationValue)
-        //{
-        //    // We can manage this type, so we store the information for the
-        //    // transition of this property...
-        //    var info = new TransitionCallbacksModel<T>(getValue, setValue);
-        //    lock (this.lockObject)
-        //    {
-        //        this.transitionedCallbacks.Add(info);
-        //    }
-        //}
-
         /// <summary>
-        /// Starts the transition.
+        /// Constructor. You pass in the object that holds the properties 
+        /// that you are performing transitions on.
         /// </summary>
-        public void Run()
+        public Transition(ITransitionType transitionMethod) : this()
         {
-            this.InternalRun(true);
+            this.TransitionMethod = transitionMethod;
         }
 
-        private void InternalRun(bool regster)
+        /// <summary>
+        /// Resets the transition.
+        /// </summary>
+        /// <param name="currentTime">The current time in milliseconds.</param>
+        public void Reset(int currentTime)
         {
-            // We find the current start values for the properties we 
-            // are animating...
-            //foreach (var info in this.transitionedPropertiesList)
-            //{
-            // var value = info.Value.originalValue;// .propertyInfo.GetValue(info.target, null);
-            //if (regster)
-            //{
-            //    info.Value.originalValue = info.managedType.Copy(value);
-            //}
-
-            this.startValue = this.originalValue;
-            //}
+            // We set the start value to the original value.
+            this.StartValue = this.OriginalValue;
 
             // We start set the start time. We use this when the timer ticks to measure 
-            // how long the transition has been runnning for...
-            var manager = TransitionManager.Instance;
-            this.startTime = manager.GetTime();
-
-            // We register this transition with the transition manager...
-            if (regster)
-            {
-                manager.Register(this);
-            }
+            // how long the transition has been runnning for.
+            this.startTime = currentTime;
         }
 
         #endregion
 
         #region Internal methods
-
-        ///// <summary>
-        ///// Property that returns a list of information about each property managed
-        ///// by this transition.
-        ///// </summary>
-        //internal IList<TransitionedPropertyInfo> TransitionedProperties
-        //{
-        //    get { return this.transitionedPropertiesList; }
-        //}
-
-        ///// <summary>
-        ///// Property that returns a list of information about each property managed
-        ///// by this transition.
-        ///// </summary>
-        //internal IDictionary<string,TransitionedPropertyInfo> TransitionedProperties
-        //{
-        //    get { return this.transitionedPropertiesList; }
-        //}
-
-        ///// <summary>
-        ///// We remove the property with the info passed in from the transition.
-        ///// </summary>
-        //internal void RemoveProperty(TransitionedPropertyInfo info)
-        //{
-        //    lock (this.lockObject)
-        //    {
-        //        this.transitionedPropertiesList.Remove(info);
-        //    }
-        //}
 
         /// <summary>
         /// Called when the transition timer ticks.
@@ -392,282 +209,141 @@ namespace Codefarts.Transitions
             }
 
             // b.
-            double transitionPercentage;
-            var isCompleted = this.transitionMethod.OnTimer(elapsedTime, out transitionPercentage);
+            var transitionPercentage = 0d;
+            var transitionMethod = this.TransitionMethod;
 
-            //// We take a copy of the list of properties we are transitioning, as
-            //// they can be changed by another thread while this method is running...
-            //TransitionedPropertyInfo[] listTransitionedProperties;
-            //lock (this.lockObject)
-            //{
-            //    listTransitionedProperties = this.transitionedPropertiesList.Select(x => x.Value).ToArray();
-            //    //foreach (var info in this.transitionedPropertiesList)
-            //    //{
-            //    //    listTransitionedProperties.Add(info.Copy());
-            //    //}
-            //}
+            // if no transition method available isCompleted will be false
+            var isCompleted = transitionMethod == null ? false : transitionMethod.OnTimer(elapsedTime, out transitionPercentage);
 
-            // c. 
-            //foreach (var info in listTransitionedProperties)
-            //{
-            //    // We get the current value for this property...    ;
-            //    //var value = info.GetIntermediateValue(info.startValue, info.endValue, transitionPercentage);
-            //    var value = Utility.Interpolate(info.startValue, info.endValue, transitionPercentage);
-
-            //    // We set it...
-            //    var args = new PropertyUpdateArgs(info.target, info.propertyInfo, value);
-            //    this.SetProperty(this, args);
-            //}
-
-
-            // We get the current value for this property...    ;
-            //var value = info.GetIntermediateValue(info.startValue, info.endValue, transitionPercentage);
-            //var value = Utility.Interpolate(this.startValue, this.endValue, transitionPercentage);
-            var interpolateCallback = this.InterpolateCallback;
+            // We interpolate the current value usiong the interpolation callback.     
+            var interpolateCallback = InterpolateCallback;
             if (interpolateCallback != null)
             {
-                var value = interpolateCallback(this.startValue, this.endValue, transitionPercentage);
-
-                // We set it...
-                //var args = new PropertyUpdateArgs(info.target, info.propertyInfo, value);
-                //this.SetProperty(this, args);
-
-                this.currentValue = value;
+                var value = interpolateCallback(this.StartValue, this.EndValue, transitionPercentage);
+                this.CurrentValue = value;
             }
 
+            // call the set value callback is present
             var valueCallback = this.SetValueCallback;
             if (valueCallback != null)
             {
-                valueCallback(this.currentValue);
+                valueCallback(this.CurrentValue);
             }
 
             // Has the transition completed?
-            if (isCompleted)
+            if (!isCompleted)
             {
-                switch (this.LoopType)
+                return;
+            }
+
+            // if not yet completed check loop type and take appropreate steps
+            switch (this.LoopType)
+            {
+                case LoopType.None:
+                    // We raise an event to notify any observers that the transition has completed.
+                    this.RaiseEvent(this.TransitionCompletedEvent, this, EventArgs.Empty);
+                    break;
+
+                case LoopType.Loop:
+                    this.Reset(currentTime);
+                    break;
+
+                case LoopType.PingPong:
+                    // if we are ping ponging swap start and end values
+                    var start = this.StartValue;
+                    this.StartValue = this.EndValue;
+                    this.EndValue = start;
+
+                    // Reset the start time. We use this when the timer ticks to measure 
+                    // how long the transition has been runnning for...
+                    this.startTime = currentTime;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Fires the event passed in in a thread-safe way. 
+        /// </summary><remarks>
+        /// This method loops through the targets of the event and invokes each in turn. If the
+        /// target supports ISychronizeInvoke (such as forms or controls) and is set to run 
+        /// on a different thread, then we call BeginInvoke to marshal the event to the target
+        /// thread. If the target does not support this interface (such as most non-form classes)
+        /// or we are on the same thread as the target, then the event is fired on the same
+        /// thread as this is called from.
+        /// </remarks>
+        private void RaiseEvent(EventHandler theEvent, object sender, EventArgs args)
+        {
+            // Is the event set up?
+            if (theEvent == null)
+            {
+                return;
+            }
+
+            // We loop through each of the delegate handlers for this event. For each of 
+            // them we need to decide whether to invoke it on the current thread or to
+            // make a cross-thread invocation...
+            foreach (EventHandler handler in theEvent.GetInvocationList())
+            {
+                try
                 {
-                    case LoopType.None:
-                        // We raise an event to notify any observers that the transition has completed...
-                        Utility.RaiseEvent(this.TransitionCompletedEvent, this, EventArgs.Empty);
-                        break;
-
-                    case LoopType.Loop:
-                        Debug.Log("Looped");
-                        this.InternalRun(false);
-                        break;
-
-                    case LoopType.PingPong:
-                        Debug.Log("PingPong");
-                        //// if we are ping ponging swap start and end values
-                        //foreach (var info in this.transitionedPropertiesList)
-                        //{
-                        //    var start = info.Value.startValue;
-                        //    info.Value.startValue = info.Value.endValue;
-                        //    info.Value.endValue = start;
-                        //}
-
-                        // if we are ping ponging swap start and end values
-                        var start = this.startValue;
-                        this.startValue = this.endValue;
-                        this.endValue = start;
-
-                        // Reset the start time. We use this when the timer ticks to measure 
-                        // how long the transition has been runnning for...
-                        var manager = TransitionManager.Instance;
-                        this.startTime = manager.GetTime();
-                        break;
+#if PORTABLE
+                    // call the handler
+                    handler(sender, args);
+#else
+                    var target = handler.Target as ISynchronizeInvoke;
+                    if (target == null || target.InvokeRequired == false)
+                    {
+                        // Either the target is not a form or control, or we are already
+                        // on the right thread for it. Either way we can just fire the
+                        // event as normal...
+                        handler(sender, args);
+                    }
+                    else
+                    {
+                        // The target is most likely a form or control that needs the
+                        // handler to be invoked on its own thread...
+                        target.BeginInvoke(handler, new object[] { sender, args });
+                    }
+#endif
+                }
+                catch (Exception)
+                {
+                    // The event handler may have been detached while processing the events.
+                    // We just ignore this and invoke the remaining handlers.
                 }
             }
         }
 
         #endregion
 
-        //        #region Private functions
+        /// <summary>
+        /// The transition method used by this transition.
+        /// </summary>                                               
+        public ITransitionType TransitionMethod { get; set; }
 
-        //        /// <summary>
-        //        /// Sets a property on the object passed in to the value passed in. This method
-        //        /// invokes itself on the GUI thread if the property is being invoked on a GUI 
-        //        /// object.
-        //        /// </summary>
-        //        private void SetProperty(object sender, PropertyUpdateArgs args)
-        //        {
-        //            try
-        //            {
-        //#if WINDOWS
-        //    // If the target is a control that has been disposed then we don't 
-        //    // try to update its properties. This can happen if the control is
-        //    // on a form that has been closed while the transition is running...
-        //                if (this.isDisposed(args.target))
-        //                {
-        //                    return;
-        //                } 
-        //#endif
+        /// <summary>
+        /// Gets or sets the targeted start value.
+        /// </summary>
+        public T StartValue { get; set; }
 
-        //                var invokeTarget = args.Target as ISynchronizeInvoke;
-        //                if (invokeTarget != null && invokeTarget.InvokeRequired)
-        //                {
-        //                    // There is some history behind the next two lines, which is worth
-        //                    // going through to understand why they are the way they are.
+        /// <summary>
+        /// Gets or sets the original value.
+        /// </summary>
+        public T OriginalValue { get; set; }
 
-        //                    // Initially we used BeginInvoke without the subsequent WaitOne for
-        //                    // the result. A transition could involve a large number of updates
-        //                    // to a property, and as this call was asynchronous it would send a 
-        //                    // large number of updates to the UI thread. These would queue up at
-        //                    // the GUI thread and mean that the UI could be some way behind where
-        //                    // the transition was.
+        /// <summary>
+        /// Gets or sets the current transition value.
+        /// </summary>
+        public T CurrentValue { get; set; }
 
-        //                    // The line was then changed to the blocking Invoke call instead. This 
-        //                    // meant that the transition only proceded at the pace that the GUI 
-        //                    // could process it, and the UI was not overloaded with "old" updates.
-
-        //                    // However, in some circumstances Invoke could block and lock up the
-        //                    // Transitions background thread. In particular, this can happen if the
-        //                    // control that we are trying to update is in the process of being 
-        //                    // disposed - for example, it is on a form that is being closed. See
-        //                    // here for details: 
-        //                    // http://social.msdn.microsoft.com/Forums/en-US/winforms/thread/7d2c941a-0016-431a-abba-67c5d5dac6a5
-
-        //                    // To solve this, we use a combination of the two earlier approaches. 
-        //                    // We use BeginInvoke as this does not block and lock up, even if the
-        //                    // underlying object is being disposed. But we do want to wait to give
-        //                    // the UI a chance to process the update. So what we do is to do the
-        //                    // asynchronous BeginInvoke, but then wait (with a short timeout) for
-        //                    // it to complete.
-        //                    var asyncResult = invokeTarget.BeginInvoke(new EventHandler<PropertyUpdateArgs>(this.SetProperty), new object[] { sender, args });
-        //                    asyncResult.AsyncWaitHandle.WaitOne(50);
-        //                }
-        //                else
-        //                {
-        //                    // We are on the correct thread, so we update the property...
-        //                    args.PropertyInfo.SetValue(args.Target, args.Value, null);
-        //                }
-        //            }
-        //            catch (Exception)
-        //            {
-        //                // We silently catch any exceptions. These could be things like 
-        //                // bounds exceptions when setting properties.
-        //            }
-        //        }
-
-        //        #endregion
-
-        #region Private static functions
-
-        ///// <summary>
-        ///// Registers a transition-type. We hold them in a dictionary.
-        ///// </summary>
-        //public static void RegisterType(IManagedType transitionType)
-        //{
-        //    var type = transitionType.GetManagedType();
-        //    managedTypes[type] = transitionType;
-        //}
-
-        #endregion
-
-        #region Private static data
-
-        // A map of Type info to IManagedType objects. These are all the types that we
-        // know how to perform transitions on...
-        //   private static IDictionary<Type, IManagedType> managedTypes = new Dictionary<Type, IManagedType>();
-
-        #endregion
-
-        #region Private data
-
-        // The transition method used by this transition...
-        private ITransitionType transitionMethod;
-        public T startValue;
-        public T originalValue;
-        public T currentValue;
-
-        public T endValue;
-
-        //// Holds information about one property on one taregt object that we are performing
-        //// a transition on...
-        //internal class TransitionedPropertyInfo
-        //{
-        //    public float startValue;
-        //    public float originalValue;
-
-        //    public float endValue;
-
-        //    //  public object target;
-
-        //    //  public PropertyInfo propertyInfo;
-
-        //    // public IManagedType managedType;
-
-
-        //    public TransitionedPropertyInfo Copy()
-        //    {
-        //        var info = new TransitionedPropertyInfo();
-        //        info.startValue = this.startValue;
-        //        info.originalValue = this.originalValue;
-        //        info.endValue = this.endValue;
-        //      //  info.target = this.target;
-        //      //  info.propertyInfo = this.propertyInfo;
-        //     //   info.managedType = this.managedType;
-        //        return info;
-        //    }
-        //}
-
-        //private interface IExecuter
-        //{
-        //    void Execute();
-        //    string Name { get; set; }
-        //    INotifyPropertyChanged Source { get; set; }
-        //}
-
-        //// Holds information about one property on one taregt object that we are performing
-        //// a transition on...
-        //internal class TransitionCallbacksModel<T> : IExecuter
-        //{
-        //    public Func<T> GetValue;
-        //    public Action<T> SetValue;
-
-        //    /// <summary>
-        //    /// Initializes a new instance of the <see cref="T:System.Object"/> class.
-        //    /// </summary>
-        //    public TransitionCallbacksModel(Func<T> getValue, Action<T> setValue)
-        //    {
-        //        this.GetValue = getValue;
-        //        this.SetValue = setValue;
-        //    }
-        //}
-
-        // The collection of properties that the current transition is animating...
-        // private IList<TransitionedPropertyInfo> transitionedPropertiesList = new List<TransitionedPropertyInfo>();
-        //  private TransitionedPropertyInfo transitionedPropertiesList;//= new Dictionary<string, TransitionedPropertyInfo>();
-
-        // The collection of properties that the current transition is animating...
-        //  private IDictionary<Type, IExecuter> transitionedCallbacks = new Dictionary<Type, IExecuter>();
-
-        //// Event args used for the event we raise when updating a property...
-        //private class PropertyUpdateArgs : EventArgs
-        //{
-        //    public PropertyUpdateArgs(object targetObject, PropertyInfo propertyInfo, float value)
-        //    {
-        //        this.Target = targetObject;
-        //        this.PropertyInfo = propertyInfo;
-        //        this.Value = value;
-        //    }
-
-        //    public object Target { get; private set; }
-
-        //    public PropertyInfo PropertyInfo { get; private set; }
-
-        //    public float Value { get; private set; }
-        //}
-
-        // An object used to lock the list of transitioned properties, as it can be 
-        // accessed by multiple threads...
-        //private object lockObject = new object();
+        /// <summary>
+        /// Gets or sets the targeted end value.
+        /// </summary>
+        public T EndValue { get; set; }
 
         /// <summary>
         /// The start time in milliseconds that this transition started running.
         /// </summary>
         private int startTime;
-
-        #endregion
     }
 }

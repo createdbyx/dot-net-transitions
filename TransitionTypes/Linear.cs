@@ -29,39 +29,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Codefarts.Transitions
+namespace Codefarts.Transitions.TransitionTypes
 {
     using System;
 
-    internal class ManagedType_Float : IManagedType
+    /// <summary>
+    /// This class manages a linear transition. The percentage complete for the transition
+    /// increases linearly with time.
+    /// </summary>
+    public class Linear : ITransitionType
     {
-        #region IManagedType Members
+        #region Public methods
 
         /// <summary>
-        /// Returns the type we're managing.
+        /// Constructor. You pass in the time (in milliseconds) that the
+        /// transition will take.
         /// </summary>
-        public Type GetManagedType()
+        public Linear(int iTransitionTime)
         {
-            return typeof(float);
+            if (iTransitionTime <= 0)
+            {
+                throw new Exception("Transition time must be greater than zero.");
+            }
+
+            this.transitionTime = iTransitionTime;
         }
 
-        /// <summary>
-        /// Returns a copy of the float passed in.
-        /// </summary>
-        public object Copy(object o)
-        {                      
-            return o;
-        }
+        #endregion
+
+        #region ITransitionMethod Members
 
         /// <summary>
-        /// Returns the interpolated value for the percentage passed in.
+        /// We return the percentage completed.
         /// </summary>
-        public object GetIntermediateValue(object start, object end, double dPercentage)
+        public bool OnTimer(int elapsedTime, out double completionPercentage)
         {
-            var fStart = Convert.ToSingle(start);
-            var fEnd = Convert.ToSingle(end);
-            return Utility.Interpolate(fStart, fEnd, dPercentage);
+            completionPercentage = (elapsedTime / this.transitionTime);
+            if (completionPercentage >= 1.0)
+            {
+                completionPercentage = 1.0;
+                return true;
+            }
+
+            return false;
         }
+
+        #endregion
+
+        #region Private data
+
+        private float transitionTime;
 
         #endregion
     }

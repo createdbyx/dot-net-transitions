@@ -29,34 +29,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Codefarts.Transitions
+namespace Codefarts.Transitions.TransitionTypes
 {
     using System;
 
     /// <summary>
-    /// Interface for all types we can perform transitions on. 
-    /// Each type (e.g. int, double, Color) that we can perform a transition on 
-    /// needs to have its own class that implements this interface. These classes 
-    /// tell the transition system how to act on objects of that type.
+    /// This transition animates with an exponential decay. This has a damping effect
+    /// similar to the motion of a needle on an electomagnetically controlled dial.
     /// </summary>
-    public interface IManagedType
+    public class CriticalDamping : ITransitionType
     {
-        /// <summary>
-        /// Returns the Type that the instance is managing.
-        /// </summary>
-        Type GetManagedType();
+        #region Public methods
 
         /// <summary>
-        /// Returns a deep copy of the object passed in. (In particular this is 
-        /// needed for types that are objects.)
+        /// Constructor. You pass in the time that the transition 
+        /// will take (in milliseconds).
         /// </summary>
-        object Copy(object o);
+        public CriticalDamping(int timeSpan)
+        {
+            if (timeSpan <= 0)
+            {
+                throw new Exception("Transition time must be greater than zero.");
+            }
+            this.transitionTime = timeSpan;
+        }
 
-        /// <summary>
-        /// Returns an object holding the value between the start and end corresponding
-        /// to the percentage passed in. (Note: the percentage can be less than 0% or
-        /// greater than 100%.)
-        /// </summary>
-        object GetIntermediateValue(object start, object end, double dPercentage);   
+        #endregion
+
+        #region ITransitionMethod Members
+
+        public bool OnTimer(int elapsedTime, out double completionPercentage)
+        {
+            // We find the percentage time elapsed...
+            var dElapsed = elapsedTime / this.transitionTime;
+            completionPercentage = (1.0 - Math.Exp(-1.0 * dElapsed * 5)) / 0.993262053;
+
+            if (dElapsed >= 1.0)
+            {
+                completionPercentage = 1.0;
+                return true;
+            }
+
+            return false;
+        }
+
+        #endregion
+
+        #region Private data
+
+        private double transitionTime = 0.0;
+
+        #endregion
     }
 }

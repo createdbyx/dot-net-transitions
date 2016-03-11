@@ -29,42 +29,63 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Codefarts.Transitions
+namespace Codefarts.Transitions.TransitionTypes
 {
     using System;
 
     /// <summary>
-    /// Manages transitions for double properties.
+    /// Manages a transition starting from a high speed and decelerating to zero by
+    /// the end of the transition.
     /// </summary>
-    internal class ManagedType_Double : IManagedType
+    public class Deceleration : ITransitionType
     {
-        #region IManagedType Members
+        #region Public methods
 
         /// <summary>
-        ///  Returns the type managed by this class.
+        /// Constructor. You pass in the time that the transition 
+        /// will take (in milliseconds).
         /// </summary>
-        public Type GetManagedType()
+        public Deceleration(int transitionTime)
         {
-            return typeof(double);
+            if (transitionTime <= 0)
+            {
+                throw new Exception("Transition time must be greater than zero.");
+            }
+
+            this.transitionTime = transitionTime;
         }
 
-        /// <summary>
-        /// Returns a copy of the double passed in.
-        /// </summary>
-        public object Copy(object o)
-        {
-            return o;
-        }
+        #endregion
+
+        #region ITransitionMethod Members
 
         /// <summary>
-        /// Returns the value between start and end for the percentage passed in.
+        /// Works out the percentage completed given the time passed in.
+        /// This uses the formula:
+        ///   s = ut + 1/2at^2
+        /// The initial velocity is 2, and the acceleration to get to 1.0
+        /// at t=1.0 is -2, so the formula becomes:
+        ///   s = t(2-t)
         /// </summary>
-        public object GetIntermediateValue(object start, object end, double dPercentage)
+        public bool OnTimer(int elapsedTime, out double completionPercentage)
         {
-            var dStart = (double)start;
-            var dEnd = (double)end;
-            return Utility.Interpolate(dStart, dEnd, dPercentage);
+            // We find the percentage time elapsed...
+            var dElapsed = elapsedTime / this.transitionTime;
+            completionPercentage = dElapsed * (2.0 - dElapsed);
+            if (dElapsed >= 1.0)
+            {
+                completionPercentage = 1.0;
+                return true;
+            }
+
+            return false;
         }
+
+        #endregion
+
+        #region Private data
+
+        private double transitionTime;
 
         #endregion
     }

@@ -38,6 +38,8 @@ namespace Codefarts.Transitions
     {
         #region Public methods
 
+        public TransitionManager Manager { get; set; }
+
         public TransitionChain(params ITransition[] transitions) : this(true, transitions)
         {
         }
@@ -76,7 +78,11 @@ namespace Codefarts.Transitions
             // when this one completes...
             var nextTransition = this.transitionsList.First.Value;
             nextTransition.TransitionCompletedEvent += this.OnTransitionCompleted;
-            nextTransition.Run();
+            var manager = this.Manager;
+            if (manager != null)
+            {
+                manager.Register(nextTransition);
+            }
         }
 
         /// <summary>

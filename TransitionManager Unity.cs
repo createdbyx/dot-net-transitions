@@ -56,7 +56,7 @@ namespace Codefarts.Transitions
         /// </summary>
         public void Awake()
         {
-            this.GetTimeCallback = () => (int)(Time.time * 1000);
+           // this.GetTimeCallback = () => (int)(Time.time * 1000);
         }
 
         /// <summary>

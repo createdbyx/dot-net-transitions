@@ -66,7 +66,7 @@ namespace Codefarts.Transitions
     /// need different parameters.
     /// 
     /// </summary>
-    public partial class Transition
+    public partial class Transition<T>
     {
         /// <summary>
         /// Returns true if the object passed in is a Control and is disposed

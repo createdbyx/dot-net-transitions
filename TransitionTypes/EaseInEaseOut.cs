@@ -29,7 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Codefarts.Transitions
+namespace Codefarts.Transitions.TransitionTypes
 {
     using System;
 
@@ -37,7 +37,7 @@ namespace Codefarts.Transitions
     /// Manages an ease-in-ease-out transition. This accelerates during the first 
     /// half of the transition, and then decelerates during the second half.
     /// </summary>
-    public class TransitionType_EaseInEaseOut : ITransitionType
+    public class EaseInEaseOut : ITransitionType
     {                                     
         #region Public methods
 
@@ -45,7 +45,7 @@ namespace Codefarts.Transitions
         /// Constructor. You pass in the time that the transition 
         /// will take (in milliseconds).
         /// </summary>
-        public TransitionType_EaseInEaseOut(int iTransitionTime)
+        public EaseInEaseOut(int iTransitionTime)
         {
             if (iTransitionTime <= 0)
             {

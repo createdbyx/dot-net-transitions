@@ -29,55 +29,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Codefarts.Transitions
+namespace Codefarts.Transitions.TransitionTypes
 {
-    using System;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// This transition animates with an exponential decay. This has a damping effect
-    /// similar to the motion of a needle on an electomagnetically controlled dial.
+    /// This transition bounces the property to a destination value and back to the
+    /// original value. It is decelerated to the destination and then acclerated back
+    /// as if being thrown against gravity and then descending back with gravity.
     /// </summary>
-    public class TransitionType_CriticalDamping : ITransitionType
+    public class ThrowAndCatch : UserDefined
     {
         #region Public methods
 
         /// <summary>
-        /// Constructor. You pass in the time that the transition 
-        /// will take (in milliseconds).
+        /// Constructor. You pass in the total time taken for the bounce.
         /// </summary>
-        public TransitionType_CriticalDamping(int timeSpan)
+        public ThrowAndCatch(int iTransitionTime)
         {
-            if (timeSpan <= 0)
-            {
-                throw new Exception("Transition time must be greater than zero.");
-            }
-            this.transitionTime = timeSpan;
+            // We create a custom "user-defined" transition to do the work...
+            IList<TransitionElement> elements = new List<TransitionElement>();
+            elements.Add(new TransitionElement(50, 100, InterpolationMethod.Deceleration));
+            elements.Add(new TransitionElement(100, 0, InterpolationMethod.Accleration));
+            this.Setup(elements, iTransitionTime);
         }
-
-        #endregion
-
-        #region ITransitionMethod Members
-
-        public bool OnTimer(int elapsedTime, out double completionPercentage)
-        {
-            // We find the percentage time elapsed...
-            var dElapsed = elapsedTime / this.transitionTime;
-            completionPercentage = (1.0 - Math.Exp(-1.0 * dElapsed * 5)) / 0.993262053;
-
-            if (dElapsed >= 1.0)
-            {
-                completionPercentage = 1.0;
-                return true;
-            }
-
-            return false;
-        }
-
-        #endregion
-
-        #region Private data
-
-        private double transitionTime = 0.0;
 
         #endregion
     }

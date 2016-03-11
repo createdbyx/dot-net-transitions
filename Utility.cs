@@ -30,45 +30,12 @@ SOFTWARE.
 */
 
 namespace Codefarts.Transitions
-{
-    using System;
-    using System.ComponentModel;
-
+{                                
     /// <summary>
     /// A class holding static utility functions.
     /// </summary>
-    internal class Utility
+    public class Utility
     {
-        /// <summary>
-        /// Returns the value of the property passed in.
-        /// </summary>
-        public static object GetValue(object target, string strPropertyName)
-        {
-            var targetType = target.GetType();
-            var propertyInfo = targetType.GetProperty(strPropertyName);
-            if (propertyInfo == null)
-            {
-                throw new Exception("Object: " + target + " does not have the property: " + strPropertyName);
-            }
-
-            return propertyInfo.GetValue(target, null);
-        }
-
-        /// <summary>
-        /// Sets the value of the property passed in.
-        /// </summary>
-        public static void SetValue(object target, string strPropertyName, object value)
-        {
-            var targetType = target.GetType();
-            var propertyInfo = targetType.GetProperty(strPropertyName);
-            if (propertyInfo == null)
-            {
-                throw new Exception("Object: " + target + " does not have the property: " + strPropertyName);
-            }
-
-            propertyInfo.SetValue(target, value, null);
-        }
-
         /// <summary>
         /// Returns a value between valueA and valueB for the percentage passed in.
         /// </summary>
@@ -126,55 +93,6 @@ namespace Codefarts.Transitions
         public static double ConvertLinearToDeceleration(double elapsed)
         {
             return elapsed * (2.0 - elapsed);
-        }
-
-        /// <summary>
-        /// Fires the event passed in in a thread-safe way. 
-        /// </summary><remarks>
-        /// This method loops through the targets of the event and invokes each in turn. If the
-        /// target supports ISychronizeInvoke (such as forms or controls) and is set to run 
-        /// on a different thread, then we call BeginInvoke to marshal the event to the target
-        /// thread. If the target does not support this interface (such as most non-form classes)
-        /// or we are on the same thread as the target, then the event is fired on the same
-        /// thread as this is called from.
-        /// </remarks>
-        public static void RaiseEvent(EventHandler theEvent, object sender, EventArgs args)
-        {
-            // Is the event set up?
-            if (theEvent == null)
-            {
-                return;
-            }
-
-            // We loop through each of the delegate handlers for this event. For each of 
-            // them we need to decide whether to invoke it on the current thread or to
-            // make a cross-thread invocation...
-            foreach (EventHandler handler in theEvent.GetInvocationList())
-            {
-                try
-                {
-                    var target = handler.Target as ISynchronizeInvoke;
-                    if (target == null || target.InvokeRequired == false)
-                    {
-                        // Either the target is not a form or control, or we are already
-                        // on the right thread for it. Either way we can just fire the
-                        // event as normal...
-                        handler(sender, args);
-                    }
-                    else
-                    {
-                        // The target is most likely a form or control that needs the
-                        // handler to be invoked on its own thread...
-                        target.BeginInvoke(handler, new object[] { sender, args });
-                    }
-                }
-                catch (Exception)
-                {
-                    // The event handler may have been detached while processing the events.
-                    // We just ignore this and invoke the remaining handlers.
-                }
-            }
-        }
-
+        }   
     }
 }

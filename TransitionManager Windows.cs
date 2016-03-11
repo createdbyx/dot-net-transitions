@@ -29,9 +29,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#if WINDOWS
+#if WINDOWS  //||PORTABLE
 namespace Codefarts.Transitions
 {
+    using System.Threading;
     using System.Timers;
 
     /// <summary>
@@ -51,37 +52,21 @@ namespace Codefarts.Transitions
     /// </remarks>
     public partial class TransitionManager
     {
-        // The timer that controls the transition animation...
-        private Timer m_Timer;
-
-        /// <summary>
-        /// Private constructor (for singleton).
-        /// </summary>
-        private TransitionManager()
+        private void InitializeComponent()
         {
-            this.m_Timer = new Timer(15);
-            this.m_Timer.Elapsed += this.OnTimerElapsed;
-            this.m_Timer.Enabled = true;
+            ThreadPool.QueueUserWorkItem(state=> this.OnTimerElapsed());
         }
-
+        
         /// <summary>
         /// Called when the timer ticks.
         /// </summary>
-        private void OnTimerElapsed(object sender, ElapsedEventArgs e)
+        private void OnTimerElapsed()
         {
-            // We turn the timer off while we process the tick, in case the
-            // actions take longer than the tick itself...
-            if (this.m_Timer == null)
+            while (true)
             {
-                return;
-            }
-
-            this.m_Timer.Enabled = false;
-
-            this.UpdateTransitions();
-
-            // We restart the timer...
-            this.m_Timer.Enabled = true;
+                this.UpdateTransitions();
+                Thread.Sleep(15);
+            }                            
         }                                 
     }
 } 

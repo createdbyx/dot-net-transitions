@@ -29,7 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Codefarts.Transitions
+namespace Codefarts.Transitions.TransitionTypes
 {
     using System;
     using System.Collections.Generic;
@@ -66,14 +66,14 @@ namespace Codefarts.Transitions
     /// heights each time.
     /// 
     /// </summary>
-    public class TransitionType_UserDefined : ITransitionType
+    public class UserDefined : ITransitionType
     {
         #region Public methods
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        public TransitionType_UserDefined()
+        public UserDefined()
         {
         }
 
@@ -81,7 +81,7 @@ namespace Codefarts.Transitions
         /// Constructor. You pass in the list of TransitionElements and the total time
         /// (in milliseconds) for the transition.
         /// </summary>
-        public TransitionType_UserDefined(IList<TransitionElement> elements, int iTransitionTime)
+        public UserDefined(IList<TransitionElement> elements, int iTransitionTime)
         {
             this.Setup(elements, iTransitionTime);
         }
@@ -97,7 +97,7 @@ namespace Codefarts.Transitions
             // We check that the elements list has some members...
             if (elements.Count == 0)
             {
-                throw new Exception("The list of elements passed to the constructor of TransitionType_UserDefined had zero elements. It must have at least one element.");
+                throw new Exception("The list of elements passed to the constructor of UserDefined had zero elements. It must have at least one element.");
             }
         }
 
@@ -147,7 +147,7 @@ namespace Codefarts.Transitions
                     break;
 
                 default:
-                    throw new Exception("Interpolation method not handled: " + eInterpolationMethod.ToString());
+                    throw new Exception("Interpolation method not handled: " + eInterpolationMethod);
             }
 
             // We now know how far through the transition we have moved, so we can interpolate

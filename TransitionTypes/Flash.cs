@@ -29,7 +29,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-namespace Codefarts.Transitions
+namespace Codefarts.Transitions.TransitionTypes
 {
     using System.Collections.Generic;
 
@@ -38,14 +38,14 @@ namespace Codefarts.Transitions
     /// up by reverting them to their initial values. You specify the number of bounces and
     /// the length of each bounce. 
     /// </summary>
-    public class TransitionType_Flash : TransitionType_UserDefined
+    public class Flash : UserDefined
     {
         #region Public methods
 
         /// <summary>
         /// You specify the number of bounces and the time taken for each bounce.
         /// </summary>
-        public TransitionType_Flash(int numberOfFlashes, int flashTime)
+        public Flash(int numberOfFlashes, int flashTime)
         {
             // This class is derived from the user-defined transition type.
             // Here we set up a custom "user-defined" transition for the 
