@@ -32,7 +32,7 @@ SOFTWARE.
 namespace Codefarts.Transitions.TransitionTypes
 {
     using System;
-
+                          
     /// <summary>
     /// Manages transitions under constant acceleration from a standing start.
     /// </summary>

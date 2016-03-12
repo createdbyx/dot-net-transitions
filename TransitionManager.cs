@@ -60,6 +60,9 @@ namespace Codefarts.Transitions
 
         private long startTime;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TransitionManager"/> class.
+        /// </summary>
         public TransitionManager()
         {
             this.startTime = DateTime.Now.Ticks;

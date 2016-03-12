@@ -56,7 +56,16 @@ namespace Codefarts.Transitions
         /// </summary>
         public void Awake()
         {
-           // this.GetTimeCallback = () => (int)(Time.time * 1000);
+            this.GetTimeCallback = () => (int)(Time.time * 1000);
+            Transition<float>.InterpolateCallback = (start, end, percent) => Utility.Interpolate(start, end, percent);
+            Transition<int>.InterpolateCallback = (start, end, percent) => Utility.Interpolate(start, end, percent);
+            Transition<double>.InterpolateCallback = (start, end, percent) => Utility.Interpolate(start, end, percent);
+            Transition<Vector3>.InterpolateCallback = (start, end, percent) => Vector3.LerpUnclamped(start, end, (float)percent);
+            Transition<Vector2>.InterpolateCallback = (start, end, percent) => Vector2.LerpUnclamped(start, end, (float)percent);
+            Transition<Vector4>.InterpolateCallback = (start, end, percent) => Vector4.LerpUnclamped(start, end, (float)percent);
+            Transition<Color>.InterpolateCallback = (start, end, percent) => Color.Lerp(start, end, (float)percent);
+            Transition<Color32>.InterpolateCallback = (start, end, percent) => Color32.Lerp(start, end, (float)percent);
+            Transition<Quaternion>.InterpolateCallback = (start, end, percent) => Quaternion.Lerp(start, end, (float)percent);
         }
 
         /// <summary>
