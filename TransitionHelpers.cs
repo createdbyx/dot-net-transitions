@@ -5,10 +5,8 @@ namespace Codefarts.Transitions
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
-
-    using Codefarts.Transitions;
-    using Codefarts.Transitions.TransitionTypes;
-
+    using System.Reflection;
+                                              
     public class TransitionHelpers
     {
         private struct SpecialKey
@@ -31,14 +29,42 @@ namespace Codefarts.Transitions
         /// <summary>
         /// Adds a property that should be animated as part of this transition.
         /// </summary>
-        public static Transition<T> Run<T>(object target, string propertyName, T destinationValue, ITransitionType type, LoopType loopType)
+        private static Transition<T> InternalRun<T>(object target, PropertyInfo propertyInfo, T startValue, T destinationValue, ITransitionType type, LoopType loopType)
         {
-            var key = new SpecialKey(target, propertyName);
+            // We can only transition properties that are both getable and setable.
+            if (propertyInfo.CanRead == false || propertyInfo.CanWrite == false)
+            {
+                throw new Exception("Property is not both getable and setable: " + propertyInfo.Name);
+            }
+
+            // We can only transition properties that are both getable and setable.
+            if (propertyInfo.PropertyType != typeof(T))
+            {
+                throw new Exception("Property type does not match destination value type: " + propertyInfo.Name);
+            }
+
+            var key = new SpecialKey(target, propertyInfo.Name);
             if (activeTransitions.ContainsKey(key))
             {
                 return activeTransitions[key] as Transition<T>;
             }
 
+            var t = Transition<T>.Run(value =>
+            {
+                SetProperty(target, new PropertyUpdateArgs(target, propertyInfo, value));
+            }, startValue, destinationValue, type, loopType);
+
+            t.TransitionCompletedEvent += OnTransitionCompletedEvent;
+            activeTransitions[key] = t;
+
+            return t;
+        }
+
+        /// <summary>
+        /// Adds a property that should be animated as part of this transition.
+        /// </summary>
+        public static Transition<T> Run<T>(object target, string propertyName, T startValue, T destinationValue, ITransitionType type, LoopType loopType)
+        {
             // We get the property info.
             var targetType = target.GetType();
             var propertyInfo = targetType.GetProperty(propertyName);
@@ -47,34 +73,34 @@ namespace Codefarts.Transitions
                 throw new Exception("Object: " + target + " does not have the property: " + propertyName);
             }
 
-            // We can only transition properties that are both getable and setable.
-            if (propertyInfo.CanRead == false || propertyInfo.CanWrite == false)
-            {
-                throw new Exception("Property is not both getable and setable: " + propertyName);
-            }
+            return InternalRun(target, propertyInfo, startValue, destinationValue, type, loopType);
+        }
 
-            // We can only transition properties that are both getable and setable.
-            if (propertyInfo.PropertyType != typeof(T))
+        /// <summary>
+        /// Adds a property that should be animated as part of this transition.
+        /// </summary>
+        public static Transition<T> Run<T>(object target, string propertyName, T destinationValue, ITransitionType type, LoopType loopType)
+        {
+            // We get the property info.
+            var targetType = target.GetType();
+            var propertyInfo = targetType.GetProperty(propertyName);
+            if (propertyInfo == null)
             {
-                throw new Exception("Property type does not match destination value type: " + propertyName);
+                throw new Exception("Object: " + target + " does not have the property: " + propertyName);
             }
 
             var currentValue = (T)propertyInfo.GetValue(target, null);
-
-            var t = Transition<T>.Run(value =>
-                {
-                    SetProperty(target, new PropertyUpdateArgs(target, propertyInfo, value));
-                }, currentValue, destinationValue, new EaseInEaseOut(1000), loopType);
-
-            t.TransitionCompletedEvent += OnTransitionCompletedEvent;
-            activeTransitions[key] = t;
-
-            return t;
+            return InternalRun(target, propertyInfo, currentValue, destinationValue, type, loopType);
         }
 
-        private static void OnTransitionCompletedEvent(object s, EventArgs e)
+        /// <summary>
+        /// Called when transition completes.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
+        private static void OnTransitionCompletedEvent(object sender, EventArgs e)
         {
-            var item = activeTransitions.FirstOrDefault(x => x.Value == s);
+            var item = activeTransitions.FirstOrDefault(x => x.Value == sender);
             item.Value.TransitionCompletedEvent -= OnTransitionCompletedEvent;
             activeTransitions.Remove(item.Key);
         }
