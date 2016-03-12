@@ -13,7 +13,7 @@
         Type ValueType { get; }
 
         /// <summary>
-        /// Event raised when the transition hass completed.
+        /// Event raised when the transition has completed.
         /// </summary>
         event EventHandler TransitionCompletedEvent;
 
