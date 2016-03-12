@@ -46,13 +46,13 @@ namespace Codefarts.Transitions
 
         public TransitionChain(bool run, params ITransition[] transitions)
         {
-            // We store the list of transitions...
+            // We store the list of transitions.
             foreach (var transition in transitions)
             {
                 this.transitionsList.AddLast(transition);
             }
 
-            // We start running them...
+            // We start running them.
             if (run)
             {
                 this.Run();
@@ -75,7 +75,7 @@ namespace Codefarts.Transitions
 
             // We find the next transition and run it. We also register
             // for its completed event, so that we can start the next transition
-            // when this one completes...
+            // when this one completes.
             var nextTransition = this.transitionsList.First.Value;
             nextTransition.TransitionCompletedEvent += this.OnTransitionCompleted;
             var manager = this.Manager;
